@@ -1,0 +1,74 @@
+aliases:
+  - &setup-heroku
+    name: Setup Heroku
+    command: bash .circleci/setup-heroku.sh $HEROKU_APP
+
+  - &deploy-to-heroku
+    name: Deploy to Heroku
+    command: |
+      git push heroku master -f
+      heroku run rake db:migrate
+      sleep 5
+      heroku restart
+
+defaults: &defaults
+    working_directory: ~/fomes-admin-backend # directory where steps will run
+    docker:
+      - image: circleci/node:8.11
+
+version: 2
+jobs:
+  build:                              # runs not using Workflows must have a `build` job as entry point
+    <<: *defaults
+    steps:                            # a collection of executable commands
+      - checkout                      # special step to check out source code to working directory
+      - run:
+          name: update-npm
+          command: 'sudo npm install -g npm@latest'
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          - v1-dependencies-          # fallback to using the latest cache if no exact match is found
+      - run:
+          name: install-dependencies
+          command: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run:
+          name: test
+          command: npm test
+#      - run:
+#          name: code-coverage
+#          command: '../node_modules/.bin/nyc report --reporter=text-lcov'
+#      - store_artifacts: # special step to save test results as as artifact
+#          path: test-results.xml
+#          prefix: tests
+#      - store_artifacts:
+#          path: coverage
+#          prefix: coverage
+#      - store_test_results: # special step to upload test results for display in Test Summary
+#          path: test-results.xml
+
+  deploy:
+    <<: *defaults
+    environment:
+      - HEROKU_APP : fomes-admin-backend
+    steps:
+      - checkout
+      - run: *setup-heroku
+      - run: *deploy-to-heroku
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
