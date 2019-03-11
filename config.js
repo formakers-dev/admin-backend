@@ -3,13 +3,14 @@ const config = {};
 config.development = {
     baseUrl: process.env.BASE_URL || 'http://localhost:8080',
     frontendBaseUrl: process.env.FRONTEND_BASE_URL || 'http://localhost:3000',
-    fomesDbUrl: process.env.FOMES_DB_URL,
     port: process.env.PORT || 8080,
+    fomesDbUrl: process.env.FOMES_DB_URL,
+
     // google_client_id: process.env.GOOGLE_CLIENT_ID,
     // google_client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    // firebase_messaging: {
-    //     serverKey: process.env.SERVER_KEY
-    // },
+    firebase_messaging: {
+        serverKey: process.env.SERVER_KEY
+    },
     // firebase: {
     //     apiKey: process.env.FIREBASE_API_KEY,
     //     databaseURL: process.env.FIREBASE_DATABASE_URL,
@@ -26,9 +27,9 @@ config.test = {
     port: 8081,
     // google_client_id: 'testClientId',
     // google_client_secret: 'testClientSecret',
-    // firebase_messaging: {
-    //     serverKey: 'testServerKey'
-    // },
+    firebase_messaging: {
+        serverKey: 'testServerKey'
+    },
     // firebase: {
     //     apiKey: process.env.FIREBASE_API_KEY,
     //     databaseURL: process.env.FIREBASE_DATABASE_URL,
