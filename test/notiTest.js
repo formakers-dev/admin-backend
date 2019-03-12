@@ -6,8 +6,6 @@ const moxios = require('moxios');
 const config = require('../config');
 const Users = require('../model/users').Users;
 
-require('../db').init();
-
 describe('Notification', () => {
     before(done => {
         Users.create([

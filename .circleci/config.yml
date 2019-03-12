@@ -51,24 +51,41 @@ jobs:
 #      - store_test_results: # special step to upload test results for display in Test Summary
 #          path: test-results.xml
 
-  deploy:
+  dev-deploy:
     <<: *defaults
     environment:
-      - HEROKU_APP : fomes-admin-backend
+      - HEROKU_APP : fomes-admin-backend-dev
     steps:
       - checkout
       - run: *setup-heroku
       - run: *deploy-to-heroku
+
+
+  prd-deploy:
+    <<: *defaults
+    environment:
+    - HEROKU_APP: fomes-admin-backend
+    steps:
+    - checkout
+    - run: *setup-heroku
+    - run: *deploy-to-heroku
 
 workflows:
   version: 2
   build-deploy:
     jobs:
       - build
-      - deploy:
+      - dev-deploy:
           requires:
             - build
           filters:
             branches:
               only:
+                - master
+      - prd-deploy:
+          requires:
+            - build
+          filters:
+            branches:
+             only:
                 - master
