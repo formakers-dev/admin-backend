@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "export NODE_ENV=test && nyc mocha --timeout 5000"
+    "test": "export NODE_ENV=test && nyc mocha --timeout 5000 --exit"
   },
   "dependencies": {
     "axios": "^0.18.0",
