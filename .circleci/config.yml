@@ -85,6 +85,7 @@ workflows:
       - prd-deploy:
           requires:
             - build
+            - dev-deploy
           filters:
             branches:
              only:
