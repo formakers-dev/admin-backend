@@ -4,8 +4,12 @@ const Users = require('../model/users').Users;
 const FirebaseUtil = require('../util/firebase');
 
 const sendNoti = (req, res) => {
+    console.log('sendNoti');
+
     Users.find({ email: {$in: req.body.emails }}, {registrationToken: true})
         .then(users => {
+            console.log('find user count=', users.length);
+
             const body = {
                 data: req.body.data,
                 registration_ids: users.map(user => user.registrationToken),
@@ -25,12 +29,16 @@ const sendNoti = (req, res) => {
 
             return axios.post('https://fcm.googleapis.com/fcm/send', body, options);
         }).then(result => res.status(200).json({result : result.data}))
-        .catch(err => res.status(500).json({error: err.message}));
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: err.message});
+        });
 };
 
 const sendNotiByTopic = (req, res) => {
-    FirebaseUtil.getAccessToken().then(firebaseAccessToken => {
+    console.log('sendNotiByTopic');
 
+    FirebaseUtil.getAccessToken().then(firebaseAccessToken => {
         const body = {
             message: {
                 topic: req.params.topic,
@@ -53,7 +61,10 @@ const sendNotiByTopic = (req, res) => {
         return axios.post('https://fcm.googleapis.com/v1/projects/'+ config.firebase.projectName +'/messages:send', body, options);
 
     }).then(result => res.status(200).json({result : result.data}))
-    .catch(err => res.status(500).json({error: err.message}));
+    .catch(err => {
+        console.error(err);
+        res.status(500).json({error: err.message});
+    });
 };
 
 module.exports = { sendNoti, sendNotiByTopic };
