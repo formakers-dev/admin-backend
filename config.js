@@ -11,11 +11,12 @@ config.development = {
     firebase_messaging: {
         serverKey: process.env.SERVER_KEY
     },
-    // firebase: {
+    firebase: {
+        projectName: process.env.FIREBASE_PROJECT_NAME,
     //     apiKey: process.env.FIREBASE_API_KEY,
     //     databaseURL: process.env.FIREBASE_DATABASE_URL,
     //     projectId: process.env.FIREBASE_PROJECT_ID,
-    // }
+    }
 };
 
 config.staging = config.development;
@@ -30,11 +31,12 @@ config.test = {
     firebase_messaging: {
         serverKey: 'testServerKey'
     },
-    // firebase: {
+    firebase: {
+        projectName: 'appbeemobile',
     //     apiKey: process.env.FIREBASE_API_KEY,
     //     databaseURL: process.env.FIREBASE_DATABASE_URL,
     //     projectId: process.env.FIREBASE_PROJECT_ID,
-    // },
+    },
     // testCustomerId: 'googleTestCustomerId',
     // testCustomerName: 'TestCustomer',
     // testProjectId: 99999999,

@@ -57,6 +57,9 @@ jobs:
       - HEROKU_APP : fomes-admin-backend-dev
     steps:
       - checkout
+      - run:
+          name: Copy firebase-service-account.json
+          command: echo FIREBASE_SERVICE_ACCOUNT_DEV | base64 --decode --output ./firebase-service-account.json
       - run: *setup-heroku
       - run: *deploy-to-heroku
 
@@ -67,6 +70,9 @@ jobs:
     - HEROKU_APP: fomes-admin-backend
     steps:
     - checkout
+    - run:
+        name: Copy firebase-service-account.json
+        command: echo FIREBASE_SERVICE_ACCOUNT | base64 --decode --output ./firebase-service-account.json
     - run: *setup-heroku
     - run: *deploy-to-heroku
 
