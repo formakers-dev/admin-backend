@@ -3,10 +3,14 @@ aliases:
     name: Setup Heroku
     command: bash .circleci/setup-heroku.sh $HEROKU_APP
 
+  - &setup-heroku-and-commit
+    name: Setup Branch and Commit
+    command: bash .circleci/setup-branch-and-commit.sh heroku-$HEROKU_APP
+
   - &deploy-to-heroku
     name: Deploy to Heroku
     command: |
-      git push heroku master -f
+      git push heroku heroku-$HEROKU_APP:master -f
       heroku run rake db:migrate
       sleep 5
       heroku restart
@@ -61,6 +65,7 @@ jobs:
           name: Copy firebase-service-account.json
           command: echo $FIREBASE_SERVICE_ACCOUNT_DEV | base64 --decode > firebase-service-account.json
       - run: *setup-heroku
+      - run: *setup-heroku-and-commit
       - run: *deploy-to-heroku
 
 
@@ -74,6 +79,7 @@ jobs:
         name: Copy firebase-service-account.json
         command: echo $FIREBASE_SERVICE_ACCOUNT | base64 --decode > firebase-service-account.json
     - run: *setup-heroku
+    - run: *setup-heroku-and-commit
     - run: *deploy-to-heroku
 
 workflows:
