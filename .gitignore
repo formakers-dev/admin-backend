@@ -1,6 +1,5 @@
 node_modules/
 .idea/
-.pairs
 npm-debug.log
 .nyc_output/
 firebase-service-account.json
