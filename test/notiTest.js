@@ -89,6 +89,42 @@ describe('Notification', () => {
                     });
                 }).catch(err => done(err));
         });
+
+        it('전달된 이메일에 해당하는 유저에게 요청된 내용의 알림 전송을 예약한다', done => {
+            const spyOnAgendaSchedule = sandbox.spy(agenda, 'schedule');
+
+            body.when = new Date('2019-03-14T15:30:00.000Z');
+
+            request.post('/noti')
+                .expect(200)
+                .send(body)
+                .then(() => {
+                    spyOnAgendaSchedule.calledOnce.should.be.true;
+
+                    spyOnAgendaSchedule.getCall(0).args[0].should.be.eql('0 30 15 14 3 *');
+                    spyOnAgendaSchedule.getCall(0).args[1].should.be.eql('Request notifications');
+
+                    const data = spyOnAgendaSchedule.getCall(0).args[2];
+                    data.emails.length.should.be.eql(2);
+                    data.emails[0].should.be.eql('email1');
+                    data.emails[1].should.be.eql('email3');
+                    data.data.channel.should.be.eql('channel_announce');
+                    data.data.title.should.be.eql('타이틀');
+                    data.data.subTitle.should.be.eql('서브타이틀');
+                    data.data.message.should.be.eql('메세지');
+                    data.data.isSummary.should.be.eql(true);
+                    data.data.summarySubText.should.be.eql('서머리서브텍스트');
+                    data.data.deeplink.should.be.eql('딥링크');
+
+                    done();
+                }).catch(err => done(err));
+        });
+
+
+        afterEach(() => {
+            sandbox.restore();
+        })
+
     });
 
     describe('POST /noti/topics/{topic}', () => {
@@ -158,7 +194,7 @@ describe('Notification', () => {
                     spyOnAgendaSchedule.calledOnce.should.be.true;
 
                     spyOnAgendaSchedule.getCall(0).args[0].should.be.eql('0 30 15 14 3 *');
-                    spyOnAgendaSchedule.getCall(0).args[1].should.be.eql('Request notifications');
+                    spyOnAgendaSchedule.getCall(0).args[1].should.be.eql('Request notifications by topic');
 
                     const data = spyOnAgendaSchedule.getCall(0).args[2];
                     data.topic.should.be.eql('notice-all');
