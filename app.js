@@ -1,16 +1,21 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var notiRouter = require('./routes/noti');
+const config = require('./config');
+const indexRouter = require('./routes/index');
+const notiRouter = require('./routes/noti');
 
-var db = require('./db');
+const db = require('./db');
 db.init();
 
-var app = express();
+const app = express();
+
+if (config.web.cors) {
+    app.use(require('cors')());
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
