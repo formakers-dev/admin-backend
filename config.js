@@ -5,6 +5,7 @@ config.development = {
     frontendBaseUrl: process.env.FRONTEND_BASE_URL || 'http://localhost:3000',
     port: process.env.PORT || 8080,
     fomesDbUrl: process.env.FOMES_DB_URL,
+    agendaDbUrl: process.env.AGENDA_DB_URL,
 
     // google_client_id: process.env.GOOGLE_CLIENT_ID,
     // google_client_secret: process.env.GOOGLE_CLIENT_SECRET,
@@ -27,8 +28,9 @@ config.production = config.development;
 
 config.test = {
     baseUrl: 'http://localhost:8081',
-    fomesDbUrl: process.env.FOMES_DB_URL,
     port: 8081,
+    fomesDbUrl: process.env.FOMES_DB_URL,
+    agendaDbUrl: process.env.AGENDA_DB_URL,
     // google_client_id: 'testClientId',
     // google_client_secret: 'testClientSecret',
     firebase_messaging: {

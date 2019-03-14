@@ -5,10 +5,13 @@ const server = require('../app');
 const request = require('supertest').agent(server);
 const moxios = require('moxios');
 const config = require('../config');
-const Users = require('../model/users').Users;
+const Users = require('../models/users').Users;
 const FirebaseUtil = require('../util/firebase');
+const agenda = require('../agenda');
 
 describe('Notification', () => {
+    const sandbox = sinon.createSandbox();
+
     before(done => {
         Users.create([
             {
@@ -104,14 +107,16 @@ describe('Notification', () => {
             },
         };
 
-        it('해당 topic을 구독하는 사용자들에게 알림을 전송한다', done => {
-            sinon.stub(FirebaseUtil, 'getAccessToken')
+        beforeEach(() => {
+            sandbox.stub(FirebaseUtil, 'getAccessToken')
                 .returns(Promise.resolve('testFirebaseAccessToken'));
 
             moxios.stubRequest('https://fcm.googleapis.com/v1/projects/appbeemobile/messages:send', {
                 status: 200
             });
+        });
 
+        it('해당 topic을 구독하는 사용자들에게 알림을 전송한다', done => {
             request.post('/noti/topics/notice-all')
                 .expect(200)
                 .send(body)
@@ -140,8 +145,40 @@ describe('Notification', () => {
                     });
                 }).catch(err => done(err));
         });
-    });
 
+        it('해당 topic을 구독하는 사용자들에게 알림 전송을 예약한다', done => {
+            const spyOnAgendaSchedule = sandbox.spy(agenda, 'schedule');
+
+            body.when = new Date('2019-03-14T15:30:00.000Z');
+
+            request.post('/noti/topics/notice-all')
+                .expect(200)
+                .send(body)
+                .then(() => {
+                    spyOnAgendaSchedule.calledOnce.should.be.true;
+
+                    spyOnAgendaSchedule.getCall(0).args[0].should.be.eql('0 30 15 14 3 *');
+                    spyOnAgendaSchedule.getCall(0).args[1].should.be.eql('Request notifications');
+
+                    const data = spyOnAgendaSchedule.getCall(0).args[2];
+                    data.topic.should.be.eql('notice-all');
+                    data.data.channel.should.be.eql('channel_announce');
+                    data.data.title.should.be.eql('타이틀');
+                    data.data.subTitle.should.be.eql('서브타이틀');
+                    data.data.message.should.be.eql('메세지');
+                    data.data.isSummary.should.be.eql(true);
+                    data.data.summarySubText.should.be.eql('서머리서브텍스트');
+                    data.data.deeplink.should.be.eql('딥링크');
+
+                    done();
+                }).catch(err => done(err));
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        })
+
+    });
 
     afterEach(() => {
         moxios.uninstall();

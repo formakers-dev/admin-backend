@@ -1,7 +1,8 @@
 const axios = require('axios');
 const config = require('../config');
-const Users = require('../model/users').Users;
-const FirebaseUtil = require('../util/firebase');
+const Users = require('../models/users').Users;
+const NotiService = require('../services/noti');
+const agenda = require('../agenda');
 
 const sendNoti = (req, res) => {
     console.log('sendNoti');
@@ -38,33 +39,31 @@ const sendNoti = (req, res) => {
 const sendNotiByTopic = (req, res) => {
     console.log('sendNotiByTopic');
 
-    FirebaseUtil.getAccessToken().then(firebaseAccessToken => {
-        const body = {
-            message: {
-                topic: req.params.topic,
-                data: req.body.data
-            }
-        };
+    if (req.body.when) {
+        const when = new Date(req.body.when);
+        // const when = moment(req.body.when).format('LT');
 
-        // [공식문서](https://firebase.google.com/docs/cloud-messaging/http-server-ref) 의 `data` 필드 설명 참고
-        if (body.message.data.isSummary) {
-            body.message.data.isSummary = body.message.data.isSummary.toString();
-        }
+        const cronFormat = when.getUTCSeconds() + " "
+            + when.getUTCMinutes() + " "
+            + when.getUTCHours() + " "
+            + when.getUTCDate() + " "
+            + (when.getUTCMonth() + 1) + " *";
 
-        const options = {
-            headers: {
-                "Authorization": 'Bearer ' + firebaseAccessToken,
-                "Content-Type": 'application/json'
-            }
-        };
+        agenda.schedule(cronFormat, 'Request notifications', {
+            data: req.body.data,
+            topic: req.params.topic
+        });
 
-        return axios.post('https://fcm.googleapis.com/v1/projects/'+ config.firebase.projectName +'/messages:send', body, options);
+        res.sendStatus(200);
+        return;
+    }
 
-    }).then(result => res.status(200).json({result : result.data}))
-    .catch(err => {
-        console.error(err);
-        res.status(500).json({error: err.message});
-    });
+    NotiService.requestByTopic(req.params.topic, req.body.data)
+        .then(result => res.status(200).json({result : result}))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: err.message});
+        });
 };
 
 module.exports = { sendNoti, sendNotiByTopic };
