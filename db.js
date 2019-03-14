@@ -2,45 +2,30 @@ const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-auto-increment');
 const config = require('./config');
 
+// TODO: 클로져 제거하고 진행해보기
+
 const getConnection = () => {
-    console.log('getConnection');
     let connection;
 
-    if (!connection) {
-        connection = mongoose.createConnection(config.fomesDbUrl, function (err) {
-            if (err) {
-                console.error('mongodb connection error', err);
-            } else {
-                console.log('mongodb connected');
-            }
-        });
+    if (!connection || connection.readyState === 0) {
+        connection = mongoose.createConnection(config.fomesDbUrl);
+        autoIncrement.initialize(connection);
+        setRecoverConfig();
     }
 
     return function() {
-        console.log('getConnection closure');
         return connection;
     };
 };
 
-const connect = () => {
-    mongoose.connect(config.fomesDbUrl, function(err) {
-        if (err) {
-            console.error('mongodb connection error', err);
-        } else {
-            console.log('mongodb connected');
-        }
-    });
-    autoIncrement.initialize(mongoose.connection);
-};
 
 const setRecoverConfig = () => {
-    mongoose.connection.on('disconnected', connect);
+    getConnection().connection.on('disconnected', getConnection);
 };
 
-const init = () => {
-    connect();
-    setRecoverConfig();
-    console.log(getConnection()());
-};
+// const init = () => {
+//     const connection = getConnection();
+//     console.log(connection);
+// };
 
-module.exports = {init};
+module.exports = { getConnection: getConnection() };

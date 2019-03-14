@@ -7,8 +7,8 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var notiRouter = require('./routes/noti');
 
-var db = require('./db');
-db.init();
+// var db = require('./db');
+// db.init();
 
 var app = express();
 
