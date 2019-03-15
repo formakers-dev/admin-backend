@@ -43,9 +43,9 @@ describe('Notification', () => {
                 "channel" : "channel_announce",
                 "title": "타이틀",
                 "subTitle": "서브타이틀",
-                "message": "메세지",
 
                 // optional
+                "message": "메세지",
                 "isSummary": true,
                 "summarySubText": "서머리서브텍스트",
                 "deeplink": "딥링크",
@@ -101,7 +101,7 @@ describe('Notification', () => {
                 .then(() => {
                     spyOnAgendaSchedule.calledOnce.should.be.true;
 
-                    spyOnAgendaSchedule.getCall(0).args[0].should.be.eql('0 30 15 14 3 *');
+                    spyOnAgendaSchedule.getCall(0).args[0].should.be.eql(new Date('2019-03-14T15:30:00.000Z'));
                     spyOnAgendaSchedule.getCall(0).args[1].should.be.eql('Request notifications');
 
                     const data = spyOnAgendaSchedule.getCall(0).args[2];
@@ -134,9 +134,9 @@ describe('Notification', () => {
                 "channel" : "channel_announce",
                 "title": "타이틀",
                 "subTitle": "서브타이틀",
-                "message": "메세지",
 
                 // optional
+                "message": "메세지",
                 "isSummary": true,
                 "summarySubText": "서머리서브텍스트",
                 "deeplink": "딥링크",
@@ -193,7 +193,7 @@ describe('Notification', () => {
                 .then(() => {
                     spyOnAgendaSchedule.calledOnce.should.be.true;
 
-                    spyOnAgendaSchedule.getCall(0).args[0].should.be.eql('0 30 15 14 3 *');
+                    spyOnAgendaSchedule.getCall(0).args[0].should.be.eql(new Date('2019-03-14T15:30:00.000Z'));
                     spyOnAgendaSchedule.getCall(0).args[1].should.be.eql('Request notifications by topic');
 
                     const data = spyOnAgendaSchedule.getCall(0).args[2];

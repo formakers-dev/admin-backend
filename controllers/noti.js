@@ -1,5 +1,3 @@
-const axios = require('axios');
-const config = require('../config');
 const NotiService = require('../services/noti');
 const agenda = require('../agenda');
 
@@ -8,15 +6,9 @@ const sendNoti = (req, res) => {
 
     if (req.body.when) {
         const when = new Date(req.body.when);
-        // const when = moment(req.body.when).format('LT');
+        console.log('Reserve notification at', when);
 
-        const cronFormat = when.getUTCSeconds() + " "
-            + when.getUTCMinutes() + " "
-            + when.getUTCHours() + " "
-            + when.getUTCDate() + " "
-            + (when.getUTCMonth() + 1) + " *";
-
-        agenda.schedule(cronFormat, 'Request notifications', req.body);
+        agenda.schedule(when, 'Request notifications', req.body);
 
         res.sendStatus(200);
         return;
@@ -35,15 +27,9 @@ const sendNotiByTopic = (req, res) => {
 
     if (req.body.when) {
         const when = new Date(req.body.when);
-        // const when = moment(req.body.when).format('LT');
+        console.log('Reserve notification at', when);
 
-        const cronFormat = when.getUTCSeconds() + " "
-            + when.getUTCMinutes() + " "
-            + when.getUTCHours() + " "
-            + when.getUTCDate() + " "
-            + (when.getUTCMonth() + 1) + " *";
-
-        agenda.schedule(cronFormat, 'Request notifications by topic', {
+        agenda.schedule(when, 'Request notifications by topic', {
             data: req.body.data,
             topic: req.params.topic
         });
