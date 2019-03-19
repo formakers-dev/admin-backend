@@ -8,9 +8,6 @@ const config = require('./config');
 const indexRouter = require('./routes/index');
 const notiRouter = require('./routes/noti');
 
-const db = require('./db');
-db.init();
-
 const app = express();
 
 if (config.web.cors) {

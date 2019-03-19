@@ -1,25 +1,52 @@
 const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
 const config = require('./config');
 
-const connect = () => {
-    mongoose.connect(config.fomesDbUrl, function(err) {
-        if (err) {
-            console.error('mongodb connection error', err);
-        } else {
-            console.log('mongodb connected');
-        }
-    });
-    autoIncrement.initialize(mongoose.connection);
+const constants = {};
+Object.defineProperty(constants, 'FOMES', {
+    value: 'fomes',
+    writable: false,
+    configurable: false
+});
+Object.defineProperty(constants, 'ADMIN', {
+    value: 'admin',
+    writable: false,
+    configurable: false
+});
+
+
+const DBMap = {
+    admin: {
+        url: config.adminDbUrl,
+        connection: null
+    },
+    fomes: {
+        url: config.fomesDbUrl,
+        connection: null
+    }
 };
 
-const setRecoverConfig = () => {
-    mongoose.connection.on('disconnected', connect);
+const getConnection = (dbName) => {
+    const db = DBMap[dbName];
+
+    if (!db) {
+        throw new Error(`DB['${dbName}'] doesn't exist.`);
+    }
+
+    if (!db.connection || db.connection.readyState === 0) {
+        db.connection = mongoose.createConnection(db.url);
+
+        setRecoverConfig(dbName);
+    }
+
+    return db.connection;
 };
 
-const init = () => {
-    connect();
-    setRecoverConfig();
+const setRecoverConfig = (dbName) => {
+    const retryConnect = () => {
+        getConnection(dbName);
+    };
+
+    DBMap[dbName].connection.on('disconnected', retryConnect);
 };
 
-module.exports = {init};
+module.exports = { getConnection, constants };

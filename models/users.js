@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const db = require('../db');
+const connection = db.getConnection(db.constants.FOMES);
 const Schema = mongoose.Schema;
 
 const Constants = {
@@ -27,5 +29,5 @@ const usersSchema = new Schema({
     wishList: Array,
 });
 
-const Users = mongoose.model('users', usersSchema);
+const Users = connection.model('users', usersSchema);
 module.exports = { Users, Constants };
