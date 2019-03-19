@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
 const db = require('../db');
+const connection = db.getConnection(db.constants.FOMES);
 const Schema = mongoose.Schema;
 
 const Constants = {
@@ -29,7 +29,5 @@ const usersSchema = new Schema({
     wishList: Array,
 });
 
-usersSchema.plugin(autoIncrement.plugin, 'users');
-
-const Users = db.getConnection().model('users', usersSchema);
+const Users = connection.model('users', usersSchema);
 module.exports = { Users, Constants };

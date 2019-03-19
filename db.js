@@ -1,31 +1,52 @@
 const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
 const config = require('./config');
 
-// TODO: 클로져 제거하고 진행해보기
+const constants = {};
+Object.defineProperty(constants, 'FOMES', {
+    value: 'fomes',
+    writable: false,
+    configurable: false
+});
+Object.defineProperty(constants, 'ADMIN', {
+    value: 'admin',
+    writable: false,
+    configurable: false
+});
 
-const getConnection = () => {
-    let connection;
 
-    if (!connection || connection.readyState === 0) {
-        connection = mongoose.createConnection(config.fomesDbUrl);
-        autoIncrement.initialize(connection);
-        setRecoverConfig();
+const DBMap = {
+    admin: {
+        url: config.adminDbUrl,
+        connection: null
+    },
+    fomes: {
+        url: config.fomesDbUrl,
+        connection: null
+    }
+};
+
+const getConnection = (dbName) => {
+    const db = DBMap[dbName];
+
+    if (!db) {
+        throw new Error(`DB['${dbName}'] doesn't exist.`);
     }
 
-    return function() {
-        return connection;
+    if (!db.connection || db.connection.readyState === 0) {
+        db.connection = mongoose.createConnection(db.url);
+
+        setRecoverConfig(dbName);
+    }
+
+    return db.connection;
+};
+
+const setRecoverConfig = (dbName) => {
+    const retryConnect = () => {
+        getConnection(dbName);
     };
+
+    DBMap[dbName].connection.on('disconnected', retryConnect);
 };
 
-
-const setRecoverConfig = () => {
-    getConnection().connection.on('disconnected', getConnection);
-};
-
-// const init = () => {
-//     const connection = getConnection();
-//     console.log(connection);
-// };
-
-module.exports = { getConnection: getConnection() };
+module.exports = { getConnection, constants };
