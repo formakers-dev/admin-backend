@@ -1,52 +1,45 @@
 const mongoose = require('mongoose');
 const config = require('./config');
 
-const constants = {};
-Object.defineProperty(constants, 'FOMES', {
-    value: 'fomes',
-    writable: false,
-    configurable: false
-});
-Object.defineProperty(constants, 'ADMIN', {
-    value: 'admin',
-    writable: false,
-    configurable: false
-});
+const connectionMap = {};
 
+const add = (connectionName, dbUrl) => {
 
-const DBMap = {
-    admin: {
-        url: config.adminDbUrl,
+    let connectionInfo = {
+        url: dbUrl,
         connection: null
-    },
-    fomes: {
-        url: config.fomesDbUrl,
-        connection: null
-    }
-};
-
-const getConnection = (dbName) => {
-    const db = DBMap[dbName];
-
-    if (!db) {
-        throw new Error(`DB['${dbName}'] doesn't exist.`);
-    }
-
-    if (!db.connection || db.connection.readyState === 0) {
-        db.connection = mongoose.createConnection(db.url);
-
-        setRecoverConfig(dbName);
-    }
-
-    return db.connection;
-};
-
-const setRecoverConfig = (dbName) => {
-    const retryConnect = () => {
-        getConnection(dbName);
     };
 
-    DBMap[dbName].connection.on('disconnected', retryConnect);
+    Object.defineProperty(connectionMap, connectionName, {
+        configurable: false,
+        get: () => {
+            return getConnection(connectionInfo);
+        },
+        set: (x) => {}
+    });
 };
 
-module.exports = { getConnection, constants };
+const getConnection = (connectionInfo) => {
+    if (!connectionInfo.connection || connectionInfo.connection.readyState === 0) {
+        connectionInfo.connection = mongoose.createConnection(connectionInfo.url);
+
+        setRecoverConfig(connectionInfo);
+    }
+
+    return connectionInfo.connection;
+};
+
+const setRecoverConfig = (connectionInfo) => {
+    const retryConnect = () => {
+        getConnection(connectionInfo);
+    };
+
+    connectionInfo.connection.on('disconnected', retryConnect);
+};
+
+// 새 DB를 연결하고 싶다면, 아래에 add 함수로 호출하세요.
+// call `add` function if you want to connect new db.
+add('FOMES', config.fomesDbUrl);
+add('ADMIN_AGENDA', config.agendaDbUrl);
+
+module.exports = connectionMap;

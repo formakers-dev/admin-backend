@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const db = require('../db');
-const connection = db.getConnection(db.constants.FOMES);
+const connection = db.FOMES;
 const Schema = mongoose.Schema;
 
 const Constants = {
