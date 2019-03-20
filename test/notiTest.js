@@ -288,6 +288,75 @@ describe('Notification', () => {
         });
     });
 
+    describe('POST /noti/reserved/cancel', () => {
+        const agenda = require('../agenda');
+
+        beforeEach(done => {
+            agenda.schedule(new Date('2119-03-20T00:00:00.000Z'), 'Request notifications', {
+                "data": {
+                    "channel": "channel_announce",
+                    "title": "타이틀",
+                    "subTitle": "서브타이틀",
+
+                    // optional
+                    "message": "메세지",
+                    "isSummary": true,
+                    "summarySubText": "서머리서브텍스트",
+                    "deeplink": "딥링크",
+                },
+                emails: ['email1', 'email2'],
+                when: '2119-03-20T00:00:00.000Z',
+            }).then(() => {
+                return agenda.schedule(new Date('2119-03-21T00:00:00.000Z'), 'Request notifications by topic', {
+                    "data": {
+                        "channel": "channel_betatest",
+                        "title": "타이틀2",
+                        "subTitle": "서브타이틀2",
+
+                        // optional
+                        "message": "메세지2",
+                        "isSummary": false,
+                        "summarySubText": "서머리서브텍스트2",
+                        "deeplink": "딥링크2",
+                    },
+                    emails: ['email3', 'email4'],
+                    when: '2119-03-21T00:00:00.000Z',
+                }).then(() => {
+                    done();
+                });
+            });
+        });
+
+        it('예약한 알림 리스트를 전달한다', done => {
+            agenda.jobs({'data.data.title': '타이틀2'}).then(jobs => {
+                const idsToCancel = jobs.map(job => job.attrs._id);
+                console.log('idsToCancel', idsToCancel);
+                return request.post('/noti/reserved/cancel')
+                    .expect(200)
+                    .send(idsToCancel);
+            }).then(() => {
+                return agenda.jobs({});
+            }).then(jobs => {
+                const actualJobs = jobs.map(job => job.attrs);
+
+                actualJobs.length.should.be.eql(1);
+
+                actualJobs[0]._id.should.be.exist;
+                actualJobs[0].data.data.channel.should.be.eql('channel_announce');
+                actualJobs[0].data.data.title.should.be.eql('타이틀');
+                actualJobs[0].data.data.subTitle.should.be.eql('서브타이틀');
+                actualJobs[0].data.data.message.should.be.eql('메세지');
+                actualJobs[0].data.data.isSummary.should.be.eql(true);
+                actualJobs[0].data.data.summarySubText.should.be.eql('서머리서브텍스트');
+                actualJobs[0].data.data.deeplink.should.be.eql('딥링크');
+                actualJobs[0].data.emails.should.be.eql(['email1', 'email2']);
+                actualJobs[0].nextRunAt.should.be.eql(new Date('2119-03-20T00:00:00.000Z'));
+
+                done();
+            }).catch(err => done(err));
+        });
+    });
+
 
     afterEach(done => {
         moxios.uninstall();

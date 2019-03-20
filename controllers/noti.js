@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const NotiService = require('../services/noti');
 const agenda = require('../agenda');
 
@@ -58,4 +59,21 @@ const getReservedNotiList = (req, res) => {
     });
 };
 
-module.exports = { sendNoti, sendNotiByTopic, getReservedNotiList };
+const cancelReservedNoti = (req, res) => {
+    console.log('cancelReservedNoti');
+    console.log(req.body);
+
+    const objectIds = req.body.map(id => mongoose.Types.ObjectId(id));
+
+    agenda.cancel({_id: {$in: objectIds}})
+        .then(numRemoved => {
+            console.log(numRemoved);
+            res.sendStatus(200);
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: err.message});
+        });
+};
+
+module.exports = { sendNoti, sendNotiByTopic, getReservedNotiList, cancelReservedNoti };
