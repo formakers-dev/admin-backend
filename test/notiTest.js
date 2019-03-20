@@ -216,8 +216,88 @@ describe('Notification', () => {
 
     });
 
-    afterEach(() => {
+    describe('GET /noti/reserved', () => {
+        const agenda = require('../agenda');
+
+        beforeEach(done => {
+            agenda.schedule(new Date('2119-03-20T00:00:00.000Z'), 'Request notifications', {
+                "data": {
+                    "channel": "channel_announce",
+                    "title": "타이틀",
+                    "subTitle": "서브타이틀",
+
+                    // optional
+                    "message": "메세지",
+                    "isSummary": true,
+                    "summarySubText": "서머리서브텍스트",
+                    "deeplink": "딥링크",
+                },
+                emails: ['email1', 'email2'],
+                when: '2119-03-20T00:00:00.000Z',
+            }).then(() => {
+                return agenda.schedule(new Date('2119-03-21T00:00:00.000Z'), 'Request notifications by topic', {
+                    "data": {
+                        "channel": "channel_betatest",
+                        "title": "타이틀2",
+                        "subTitle": "서브타이틀2",
+
+                        // optional
+                        "message": "메세지2",
+                        "isSummary": false,
+                        "summarySubText": "서머리서브텍스트2",
+                        "deeplink": "딥링크2",
+                    },
+                    emails: ['email3', 'email4'],
+                    when: '2119-03-21T00:00:00.000Z',
+                }).then(() => {
+                    done();
+                });
+            });
+        });
+
+        it('예약한 알림 리스트를 전달한다', done => {
+            request.get('/noti/reserved')
+                .expect(200)
+                .then(res => {
+                    res.body.length.should.be.eql(2);
+
+                    res.body[0]._id.should.be.exist;
+                    res.body[0].data.data.channel.should.be.eql('channel_announce');
+                    res.body[0].data.data.title.should.be.eql('타이틀');
+                    res.body[0].data.data.subTitle.should.be.eql('서브타이틀');
+                    res.body[0].data.data.message.should.be.eql('메세지');
+                    res.body[0].data.data.isSummary.should.be.eql(true);
+                    res.body[0].data.data.summarySubText.should.be.eql('서머리서브텍스트');
+                    res.body[0].data.data.deeplink.should.be.eql('딥링크');
+                    res.body[0].data.emails.should.be.eql(['email1', 'email2']);
+                    res.body[0].nextRunAt.should.be.eql('2119-03-20T00:00:00.000Z');
+
+                    res.body[1]._id.should.be.exist;
+                    res.body[1].data.data.channel.should.be.eql('channel_betatest');
+                    res.body[1].data.data.title.should.be.eql('타이틀2');
+                    res.body[1].data.data.subTitle.should.be.eql('서브타이틀2');
+                    res.body[1].data.data.message.should.be.eql('메세지2');
+                    res.body[1].data.data.isSummary.should.be.eql(false);
+                    res.body[1].data.data.summarySubText.should.be.eql('서머리서브텍스트2');
+                    res.body[1].data.data.deeplink.should.be.eql('딥링크2');
+                    res.body[1].data.emails.should.be.eql(['email3', 'email4']);
+                    res.body[1].nextRunAt.should.be.eql('2119-03-21T00:00:00.000Z');
+
+                    done();
+                }).catch(err => done(err));
+        });
+    });
+
+
+    afterEach(done => {
         moxios.uninstall();
+
+        agenda.jobs({})
+            .then(jobs => {
+                jobs.forEach(job => job.remove());
+                done();
+            })
+            .catch(err => done(err));
     });
 
     after(done => {

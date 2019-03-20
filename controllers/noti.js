@@ -46,4 +46,16 @@ const sendNotiByTopic = (req, res) => {
         });
 };
 
-module.exports = { sendNoti, sendNotiByTopic };
+const getReservedNotiList = (req, res) => {
+    console.log('getReservedNotiList');
+
+    agenda.jobs({}).then((jobs) => {
+        console.log('getReservedNotiList) jobs=', jobs.length);
+        res.send(jobs);
+    }).catch(err => {
+        console.error(err);
+        res.status(500).json({error: err.message});
+    });
+};
+
+module.exports = { sendNoti, sendNotiByTopic, getReservedNotiList };

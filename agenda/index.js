@@ -48,6 +48,7 @@ agenda.define('Request notifications by topic', (job, done) => {
 });
 
 agenda.on('ready', () => {
+    console.log('agenda start!');
     agenda.start();
 });
 
