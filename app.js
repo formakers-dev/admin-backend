@@ -10,10 +10,10 @@ const notiRouter = require('./routes/noti');
 
 const app = express();
 
-var corsOptions = {
-    origin: config.frontendBaseUrl,
+const corsOptions = {
+    origin: '*',
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
+};
 
 if (config.web.cors) {
     app.use(require('cors')(corsOptions));
