@@ -38,91 +38,181 @@ describe('Notification', () => {
 
     describe('POST /noti', () => {
 
-        const body = {
-            "data": {
-                "channel" : "channel_announce",
-                "title": "타이틀",
-                "subTitle": "서브타이틀",
+        describe('타겟이 이메일로 전달된 경우', () => {
+            const body = {
+                "data": {
+                    "channel": "channel_announce",
+                    "title": "타이틀",
+                    "subTitle": "서브타이틀",
 
-                // optional
-                "message": "메세지",
-                "isSummary": true,
-                "summarySubText": "서머리서브텍스트",
-                "deeplink": "딥링크",
-            },
-            receivers: {
-                type: "email",
-                value : ["email1", "email3"]
-            }
-        };
+                    // optional
+                    "message": "메세지",
+                    "isSummary": true,
+                    "summarySubText": "서머리서브텍스트",
+                    "deeplink": "딥링크",
+                },
+                receivers: {
+                    type: "email",
+                    value: ["email1", "email3"]
+                }
+            };
 
-        it('전달된 이메일에 해당하는 유저에게 요청된 내용의 알림을 전송한다', done => {
-            moxios.stubRequest('https://fcm.googleapis.com/fcm/send', {
-                status: 200
+            it('해당하는 유저에게 요청된 내용의 알림을 전송한다', done => {
+                moxios.stubRequest('https://fcm.googleapis.com/fcm/send', {
+                    status: 200
+                });
+
+                request.post('/noti')
+                    .expect(200)
+                    .send(body)
+                    .then(() => {
+                        moxios.wait(() => {
+                            const request = moxios.requests.mostRecent();
+
+                            const url = request.url;
+                            url.should.be.eql('https://fcm.googleapis.com/fcm/send');
+
+                            const header = request.headers;
+                            header.Authorization.should.be.eql('key=' + config.firebase_messaging.serverKey);
+                            header['Content-Type'].should.be.eql('application/json');
+
+                            const body = JSON.parse(request.config.data);
+                            body.data.channel.should.be.eql('channel_announce');
+                            body.data.title.should.be.eql('타이틀');
+                            body.data.subTitle.should.be.eql('서브타이틀');
+                            body.data.message.should.be.eql('메세지');
+                            body.data.isSummary.should.be.eql("true");
+                            body.data.summarySubText.should.be.eql('서머리서브텍스트');
+                            body.data.deeplink.should.be.eql('딥링크');
+
+                            body.registration_ids.length.should.be.eql(2);
+                            body.registration_ids[0].should.be.eql('registrationToken1');
+                            body.registration_ids[1].should.be.eql('registrationToken3');
+
+                            done();
+                        });
+                    }).catch(err => done(err));
             });
 
-            request.post('/noti')
-                .expect(200)
-                .send(body)
-                .then(() => {
-                    moxios.wait(() => {
-                        const request = moxios.requests.mostRecent();
+            it('해당하는 유저에게 요청된 내용의 알림 전송을 예약한다', done => {
+                const spyOnAgendaSchedule = sandbox.spy(agenda, 'schedule');
 
-                        const url = request.url;
-                        url.should.be.eql('https://fcm.googleapis.com/fcm/send');
+                body.when = new Date('2019-03-14T15:30:00.000Z');
 
-                        const header = request.headers;
-                        header.Authorization.should.be.eql('key=' + config.firebase_messaging.serverKey);
-                        header['Content-Type'].should.be.eql('application/json');
+                request.post('/noti')
+                    .expect(200)
+                    .send(body)
+                    .then(() => {
+                        spyOnAgendaSchedule.calledOnce.should.be.true;
 
-                        const body = JSON.parse(request.config.data);
-                        body.data.channel.should.be.eql('channel_announce');
-                        body.data.title.should.be.eql('타이틀');
-                        body.data.subTitle.should.be.eql('서브타이틀');
-                        body.data.message.should.be.eql('메세지');
-                        body.data.isSummary.should.be.eql("true");
-                        body.data.summarySubText.should.be.eql('서머리서브텍스트');
-                        body.data.deeplink.should.be.eql('딥링크');
+                        spyOnAgendaSchedule.getCall(0).args[0].should.be.eql(new Date('2019-03-14T15:30:00.000Z'));
+                        spyOnAgendaSchedule.getCall(0).args[1].should.be.eql('Request notifications');
 
-                        body.registration_ids.length.should.be.eql(2);
-                        body.registration_ids[0].should.be.eql('registrationToken1');
-                        body.registration_ids[1].should.be.eql('registrationToken3');
+                        const data = spyOnAgendaSchedule.getCall(0).args[2];
+                        data.receivers.value.length.should.be.eql(2);
+                        data.receivers.value[0].should.be.eql('email1');
+                        data.receivers.value[1].should.be.eql('email3');
+                        data.data.channel.should.be.eql('channel_announce');
+                        data.data.title.should.be.eql('타이틀');
+                        data.data.subTitle.should.be.eql('서브타이틀');
+                        data.data.message.should.be.eql('메세지');
+                        data.data.isSummary.should.be.eql(true);
+                        data.data.summarySubText.should.be.eql('서머리서브텍스트');
+                        data.data.deeplink.should.be.eql('딥링크');
 
                         done();
-                    });
-                }).catch(err => done(err));
+                    }).catch(err => done(err));
+            });
         });
 
-        it('전달된 이메일에 해당하는 유저에게 요청된 내용의 알림 전송을 예약한다', done => {
-            const spyOnAgendaSchedule = sandbox.spy(agenda, 'schedule');
+        describe('타겟이 유저 아이디로 전달된 경우', () => {
+            const body = {
+                "data": {
+                    "channel" : "channel_announce",
+                    "title": "타이틀",
+                    "subTitle": "서브타이틀",
 
-            body.when = new Date('2019-03-14T15:30:00.000Z');
+                    // optional
+                    "message": "메세지",
+                    "isSummary": true,
+                    "summarySubText": "서머리서브텍스트",
+                    "deeplink": "딥링크",
+                },
+                receivers: {
+                    type: "userId",
+                    value : ["userId1", "userId3"]
+                }
+            };
 
-            request.post('/noti')
-                .expect(200)
-                .send(body)
-                .then(() => {
-                    spyOnAgendaSchedule.calledOnce.should.be.true;
+            it('해당하는 유저에게 요청된 내용의 알림을 전송한다', done => {
+                moxios.stubRequest('https://fcm.googleapis.com/fcm/send', {
+                    status: 200
+                });
 
-                    spyOnAgendaSchedule.getCall(0).args[0].should.be.eql(new Date('2019-03-14T15:30:00.000Z'));
-                    spyOnAgendaSchedule.getCall(0).args[1].should.be.eql('Request notifications');
+                request.post('/noti')
+                    .expect(200)
+                    .send(body)
+                    .then(() => {
+                        moxios.wait(() => {
+                            const request = moxios.requests.mostRecent();
 
-                    const data = spyOnAgendaSchedule.getCall(0).args[2];
-                    data.receivers.value.length.should.be.eql(2);
-                    data.receivers.value[0].should.be.eql('email1');
-                    data.receivers.value[1].should.be.eql('email3');
-                    data.data.channel.should.be.eql('channel_announce');
-                    data.data.title.should.be.eql('타이틀');
-                    data.data.subTitle.should.be.eql('서브타이틀');
-                    data.data.message.should.be.eql('메세지');
-                    data.data.isSummary.should.be.eql(true);
-                    data.data.summarySubText.should.be.eql('서머리서브텍스트');
-                    data.data.deeplink.should.be.eql('딥링크');
+                            const url = request.url;
+                            url.should.be.eql('https://fcm.googleapis.com/fcm/send');
 
-                    done();
-                }).catch(err => done(err));
+                            const header = request.headers;
+                            header.Authorization.should.be.eql('key=' + config.firebase_messaging.serverKey);
+                            header['Content-Type'].should.be.eql('application/json');
+
+                            const body = JSON.parse(request.config.data);
+                            body.data.channel.should.be.eql('channel_announce');
+                            body.data.title.should.be.eql('타이틀');
+                            body.data.subTitle.should.be.eql('서브타이틀');
+                            body.data.message.should.be.eql('메세지');
+                            body.data.isSummary.should.be.eql("true");
+                            body.data.summarySubText.should.be.eql('서머리서브텍스트');
+                            body.data.deeplink.should.be.eql('딥링크');
+
+                            body.registration_ids.length.should.be.eql(2);
+                            body.registration_ids[0].should.be.eql('registrationToken1');
+                            body.registration_ids[1].should.be.eql('registrationToken3');
+
+                            done();
+                        });
+                    }).catch(err => done(err));
+            });
+
+
+            it('해당하는 유저에게 요청된 내용의 알림 전송을 예약한다', done => {
+                const spyOnAgendaSchedule = sandbox.spy(agenda, 'schedule');
+
+                body.when = new Date('2019-03-14T15:30:00.000Z');
+
+                request.post('/noti')
+                    .expect(200)
+                    .send(body)
+                    .then(() => {
+                        spyOnAgendaSchedule.calledOnce.should.be.true;
+
+                        spyOnAgendaSchedule.getCall(0).args[0].should.be.eql(new Date('2019-03-14T15:30:00.000Z'));
+                        spyOnAgendaSchedule.getCall(0).args[1].should.be.eql('Request notifications');
+
+                        const data = spyOnAgendaSchedule.getCall(0).args[2];
+                        data.receivers.value.length.should.be.eql(2);
+                        data.receivers.value[0].should.be.eql('userId1');
+                        data.receivers.value[1].should.be.eql('userId3');
+                        data.data.channel.should.be.eql('channel_announce');
+                        data.data.title.should.be.eql('타이틀');
+                        data.data.subTitle.should.be.eql('서브타이틀');
+                        data.data.message.should.be.eql('메세지');
+                        data.data.isSummary.should.be.eql(true);
+                        data.data.summarySubText.should.be.eql('서머리서브텍스트');
+                        data.data.deeplink.should.be.eql('딥링크');
+
+                        done();
+                    }).catch(err => done(err));
+            });
+
         });
-
 
         afterEach(() => {
             sandbox.restore();
