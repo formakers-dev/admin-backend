@@ -15,7 +15,7 @@ const sendNoti = (req, res) => {
         return;
     }
 
-    NotiService.request(req.body.emails, req.body.data)
+    NotiService.request(req.body.receivers, req.body.data)
         .then(result => res.status(200).json({result : result}))
         .catch(err => {
             console.error(err);

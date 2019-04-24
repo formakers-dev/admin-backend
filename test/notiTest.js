@@ -50,7 +50,10 @@ describe('Notification', () => {
                 "summarySubText": "서머리서브텍스트",
                 "deeplink": "딥링크",
             },
-            "emails": ["email1", "email3"]
+            receivers: {
+                type: "email",
+                value : ["email1", "email3"]
+            }
         };
 
         it('전달된 이메일에 해당하는 유저에게 요청된 내용의 알림을 전송한다', done => {
@@ -105,9 +108,9 @@ describe('Notification', () => {
                     spyOnAgendaSchedule.getCall(0).args[1].should.be.eql('Request notifications');
 
                     const data = spyOnAgendaSchedule.getCall(0).args[2];
-                    data.emails.length.should.be.eql(2);
-                    data.emails[0].should.be.eql('email1');
-                    data.emails[1].should.be.eql('email3');
+                    data.receivers.value.length.should.be.eql(2);
+                    data.receivers.value[0].should.be.eql('email1');
+                    data.receivers.value[1].should.be.eql('email3');
                     data.data.channel.should.be.eql('channel_announce');
                     data.data.title.should.be.eql('타이틀');
                     data.data.subTitle.should.be.eql('서브타이틀');

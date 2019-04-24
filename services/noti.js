@@ -3,8 +3,16 @@ const Users = require('../models/users').Users;
 const FirebaseUtil = require('../util/firebase');
 const config = require('../config');
 
-const request = (emails, data) => {
-    return Users.find({ email: {$in: emails }}, {registrationToken: true})
+const request = (receivers, data) => {
+
+    const filter = { };
+
+    // 클라와 디비가 강한 디펜던시를 가지게 되서 좋지 않은 방법이지만...ㅠ
+    filter[receivers.type] = { $in: receivers.value };
+
+    console.log(filter);
+
+    return Users.find(filter, {registrationToken: true})
         .then(users => {
             console.log('find user count=', users.length);
 
