@@ -88,15 +88,12 @@ workflows:
     jobs:
       - build
       - dev-deploy:
-          requires:
-            - build
           filters:
             branches:
               only:
                 - master
       - prd-deploy:
           requires:
-            - build
             - dev-deploy
           filters:
             branches:
