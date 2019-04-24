@@ -13,7 +13,7 @@ const agenda = new Agenda({
 agenda.define('Request notifications', (job, done) => {
     console.log('[job] Request notifications (' + new Date() + ')\ndata=', JSON.stringify(job.attrs.data));
 
-    NotiService.request(job.attrs.data.emails, job.attrs.data.data)
+    NotiService.request(job.attrs.data.receivers, job.attrs.data.data)
         .then(result => {
             console.log(result);
             job.remove();
