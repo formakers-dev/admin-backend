@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const cors = require('cors');
 
 const config = require('./config');
 const indexRouter = require('./routes/index');
@@ -11,12 +12,13 @@ const notiRouter = require('./routes/noti');
 const app = express();
 
 const corsOptions = {
-    origin: '*',
+    origin: config.frontendBaseUrl,
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
 if (config.web.cors) {
-    app.use(require('cors')(corsOptions));
+    app.options(config.frontendBaseUrl, cors(corsOptions));
+    app.use(cors(corsOptions));
 }
 
 // view engine setup
@@ -24,7 +26,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
-app.use(express.json());
+app.use(express.json())
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
