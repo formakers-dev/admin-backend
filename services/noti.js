@@ -3,8 +3,16 @@ const Users = require('../models/users').Users;
 const FirebaseUtil = require('../util/firebase');
 const config = require('../config');
 
-const request = (receivers, data) => {
+const convertToNotiData = (data) => {
+    // [공식문서](https://firebase.google.com/docs/cloud-messaging/http-server-ref) 의 `data` 필드 설명 참고
+    if (data.isSummary) {
+        data.isSummary = data.isSummary.toString();
+    }
 
+    return data;
+};
+
+const request = (receivers, data) => {
     const filter = { };
 
     if (receivers.isExcluded) {
@@ -22,14 +30,9 @@ const request = (receivers, data) => {
             console.log('find user count=', users.length);
 
             const body = {
-                data: data,
+                data: convertToNotiData(data),
                 registration_ids: users.map(user => user.registrationToken),
             };
-
-            // [공식문서](https://firebase.google.com/docs/cloud-messaging/http-server-ref) 의 `data` 필드 설명 참고
-            if (body.data.isSummary) {
-                body.data.isSummary = body.data.isSummary.toString();
-            }
 
             const options = {
                 headers: {
@@ -47,14 +50,9 @@ const requestByTopic = (topic, data) => {
         const body = {
             message: {
                 topic: topic,
-                data: data
+                data: convertToNotiData(data)
             }
         };
-
-        // [공식문서](https://firebase.google.com/docs/cloud-messaging/http-server-ref) 의 `data` 필드 설명 참고
-        if (body.message.data.isSummary) {
-            body.message.data.isSummary = body.message.data.isSummary.toString();
-        }
 
         const options = {
             headers: {
