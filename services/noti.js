@@ -18,6 +18,13 @@ const request = (receivers, data) => {
     if (receivers.isExcluded) {
         // 클라와 디비가 강한 디펜던시를 가지게 되서 좋지 않은 방법이지만...ㅠ
         filter[receivers.type] = {$nin: receivers.value};
+
+        // 1000명이 넘는 알림 전송 요청을 피하기위한 임시코드
+        // TODO: 토픽을 이용한 알림 전송 도입 시 삭제 필요
+        const activatedDateConstraint = new Date();
+        activatedDateConstraint.setDate(activatedDateConstraint.getDate() - 30);
+
+        filter['activatedDate'] = {$gte: activatedDateConstraint};
     } else {
         // 클라와 디비가 강한 디펜던시를 가지게 되서 좋지 않은 방법이지만...ㅠ
         filter[receivers.type] = {$in: receivers.value};

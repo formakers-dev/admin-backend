@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const server = require('../app');
 const request = require('supertest').agent(server);
 const moxios = require('moxios');
+const axios = require('axios');
 const config = require('../config');
 const Users = require('../models/users').Users;
 const FirebaseUtil = require('../util/firebase');
@@ -18,16 +19,37 @@ describe('Notification', () => {
                 userId: "userId1",
                 email: "email1",
                 registrationToken: 'registrationToken1',
+                activatedDate: new Date('2019-08-21'),
             },
             {
                 userId: "userId2",
                 email: "email2",
                 registrationToken: 'registrationToken2',
+                activatedDate: new Date('2019-08-14'),
             },
             {
                 userId: "userId3",
                 email: "email3",
                 registrationToken: 'registrationToken3',
+                activatedDate: new Date('2019-08-07'),
+            },
+            {
+                userId: "userId4",
+                email: "email4",
+                registrationToken: 'registrationToken4',
+                activatedDate: new Date('2019-07-31'),
+            },
+            {
+                userId: "userId5",
+                email: "email5",
+                registrationToken: 'registrationToken5',
+                activatedDate: new Date('2019-07-22'),
+            },
+            {
+                userId: "userId6",
+                email: "email6",
+                registrationToken: 'registrationToken6',
+                activatedDate: new Date('2019-07-21'),
             }
         ], done);
     });
@@ -181,7 +203,6 @@ describe('Notification', () => {
                     }).catch(err => done(err));
             });
 
-
             it('해당하는 유저에게 요청된 내용의 알림 전송을 예약한다', done => {
                 const spyOnAgendaSchedule = sandbox.spy(agenda, 'schedule');
 
@@ -212,6 +233,65 @@ describe('Notification', () => {
                     }).catch(err => done(err));
             });
 
+        });
+
+        describe('특정 유저를 제외한 나머지에게 알림을 보내는 경우', () => {
+            const body = {
+                "data": {
+                    "channel" : "channel_announce",
+                    "title": "타이틀",
+                    "subTitle": "서브타이틀",
+
+                    // optional
+                    "message": "메세지",
+                    "isSummary": true,
+                    "summarySubText": "서머리서브텍스트",
+                    "deeplink": "딥링크",
+                },
+                receivers: {
+                    type: "userId",
+                    value : ["userId1", "userId3"],
+                    isExcluded: true
+                }
+            };
+
+            it('앱이 활성화됐던 날짜가 최대 30일 전인 사람까지 전송한다.', done => {
+                sandbox.useFakeTimers(new Date("2019-08-21T00:00:00.000Z").getTime());
+                const stubAxiosPost = sandbox.stub(axios, 'post')
+                    .returns(Promise.resolve({data: 'test'}));
+
+                request.post('/noti')
+                    .expect(200)
+                    .send(body)
+                    .then(() => {
+                        const url = stubAxiosPost.getCall(0).args[0];
+                        url.should.be.eql('https://fcm.googleapis.com/fcm/send');
+
+                        const registration_ids = [
+                            'registrationToken2',
+                            'registrationToken4',
+                            'registrationToken5'
+                        ];
+
+                        const body = stubAxiosPost.getCall(0).args[1];
+
+                        body.data.channel.should.be.eql('channel_announce');
+                        body.data.title.should.be.eql('타이틀');
+                        body.data.subTitle.should.be.eql('서브타이틀');
+                        body.data.message.should.be.eql('메세지');
+                        body.data.isSummary.should.be.eql("true");
+                        body.data.summarySubText.should.be.eql('서머리서브텍스트');
+                        body.data.deeplink.should.be.eql('딥링크');
+                        body.registration_ids.length.should.be.eql(3);
+                        body.registration_ids.should.have.members(registration_ids);
+
+                        const header = stubAxiosPost.getCall(0).args[2].headers;
+                        header.Authorization.should.be.eql('key=' + config.firebase_messaging.serverKey);
+                        header['Content-Type'].should.be.eql('application/json');
+
+                        done();
+                    }).catch(err => done(err));
+            });
         });
 
         afterEach(() => {
