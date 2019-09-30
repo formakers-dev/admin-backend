@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Controller = require('../controllers/betaTests');
 
-/* GET users listing. */
 router.post('/', Controller.registerBetaTest);
+router.get('/all', Controller.getAllBetaTests);
 
 module.exports = router;

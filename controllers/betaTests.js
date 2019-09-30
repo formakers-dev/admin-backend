@@ -22,4 +22,19 @@ const registerBetaTest = (req, res) => {
         });
 };
 
-module.exports = { registerBetaTest };
+const getAllBetaTests = (req, res) => {
+    BetaTestService.findAllBetaTest()
+        .then(result => {
+            console.log(result);
+            res.json(result)
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: err.message});
+        });
+};
+
+module.exports = {
+    registerBetaTest,
+    getAllBetaTests
+};
