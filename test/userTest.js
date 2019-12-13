@@ -33,13 +33,19 @@ describe('Users', () => {
     });
 
     describe('GET /users/:email/nick-name', () => {
-        it('해당 이메일을 가지는 유저의 닉네임을 리턴한다', () => {
+        it('해당 이메일을 가지는 유저의 닉네임을 리턴한다', done => {
             request.get('/users/email3/nick-name')
                 .expect(200)
                 .then(res => {
-                    res.data.should.be.eql("닉네임3");
+                    console.log(res.body)
+                    res.body.nickName.should.be.eql("닉네임3");
                     done();
                 }).catch(err => done(err));
+        });
+
+        it('해당 이메일을 가지는 유저가 없으면 204를 리턴한다', done => {
+            request.get('/users/email9999/nick-name')
+                .expect(204, done);
         });
     });
 

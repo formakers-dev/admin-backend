@@ -2,9 +2,16 @@ const UsersService = require('../services/users');
 
 const getNickName = (req, res) => {
     UsersService.getNickName(req.params.email)
-        .then(result => {
-            console.log(result[0].nickName)
-            res.json(result[0].nickName);
+        .then(results => {
+            if (results.length > 0) {
+                console.log(results[0]);
+                res.json({
+                    email: req.params.email,
+                    nickName: results[0].nickName,
+                });
+            } else {
+                res.sendStatus(204);
+            }
         })
         .catch(err => {
             console.error(err);
