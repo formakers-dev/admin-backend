@@ -11,8 +11,8 @@ const insertBetaTest = (betaTest) => {
 };
 
 const findAllBetaTest = () => {
-    return BetaTests.find({});
-}
+    return BetaTests.find({}).sort({closeDate: -1});
+};
 
 module.exports = {
     getNewObjectId,
