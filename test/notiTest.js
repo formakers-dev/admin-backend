@@ -432,6 +432,7 @@ describe('Notification', () => {
             request.get('/noti/reserved')
                 .expect(200)
                 .then(res => {
+                    console.log(res.body);
                     res.body.length.should.be.eql(2);
 
                     res.body[0]._id.should.be.exist;
@@ -500,7 +501,7 @@ describe('Notification', () => {
             });
         });
 
-        it('예약한 알림 리스트를 전달한다', done => {
+        it('해당 예약 알림을 취소한다', done => {
             agenda.jobs({'data.data.title': '타이틀2'}).then(jobs => {
                 const idsToCancel = jobs.map(job => job.attrs._id);
                 console.log('idsToCancel', idsToCancel);

@@ -4,7 +4,6 @@ const getNickName = (req, res) => {
     UsersService.getNickName(req.params.email)
         .then(results => {
             if (results.length > 0) {
-                console.log(results[0]);
                 res.json({
                     email: req.params.email,
                     nickName: results[0].nickName,
