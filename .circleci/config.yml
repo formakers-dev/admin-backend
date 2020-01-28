@@ -68,6 +68,18 @@ jobs:
       - run: *setup-heroku-and-commit
       - run: *deploy-to-heroku
 
+  stg-deploy:
+    <<: *defaults
+    environment:
+      - HEROKU_APP: fomes-admin-backend-stg
+    steps:
+      - checkout
+      - run:
+          name: Copy firebase-service-account.json
+          command: echo $FIREBASE_SERVICE_ACCOUNT_DEV | base64 --decode > firebase-service-account.json
+      - run: *setup-heroku
+      - run: *setup-heroku-and-commit
+      - run: *deploy-to-heroku
 
   prd-deploy:
     <<: *defaults
@@ -92,10 +104,15 @@ workflows:
             branches:
               only:
                 - master
-      - prd-deploy:
+      - stg-deploy:
           requires:
             - dev-deploy
           filters:
             branches:
-             only:
+              only:
                 - master
+      - prd-deploy:
+          filters:
+            branches:
+             only:
+                - release
