@@ -6,6 +6,7 @@ config.development = {
     port: process.env.PORT || 8080,
     fomesDbUrl: process.env.FOMES_DB_URL,
     agendaDbUrl: process.env.AGENDA_DB_URL,
+    adminDbUrl: process.env.ADMIN_DB_URL,
 
     // google_client_id: process.env.GOOGLE_CLIENT_ID,
     // google_client_secret: process.env.GOOGLE_CLIENT_SECRET,
@@ -31,6 +32,8 @@ config.test = {
     port: 8081,
     fomesDbUrl: process.env.FOMES_DB_URL,
     agendaDbUrl: process.env.AGENDA_DB_URL,
+    adminDbUrl: process.env.ADMIN_DB_URL,
+
     // google_client_id: 'testClientId',
     // google_client_secret: 'testClientSecret',
     firebase_messaging: {
