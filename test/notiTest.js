@@ -390,7 +390,6 @@ describe('Notification', () => {
     });
 
     describe('GET /noti/reserved', () => {
-        const agenda = require('../agenda');
 
         beforeEach(done => {
             agenda.schedule(new Date('2119-03-20T00:00:00.000Z'), 'Request notifications', {
@@ -463,7 +462,6 @@ describe('Notification', () => {
     });
 
     describe('POST /noti/reserved/cancel', () => {
-        const agenda = require('../agenda');
 
         beforeEach(done => {
             agenda.schedule(new Date('2119-03-20T00:00:00.000Z'), 'Request notifications', {
