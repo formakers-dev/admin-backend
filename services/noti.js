@@ -1,5 +1,7 @@
 const axios = require('axios');
 const Users = require('../models/users').Users;
+const NotiHistories = require('../models/notiHistories').NotiHistories;
+const NotiHistoryConstants = require('../models/notiHistories').Constants;
 const FirebaseUtil = require('../util/firebase');
 const config = require('../config');
 
@@ -49,7 +51,13 @@ const request = (receivers, data) => {
             };
 
             return axios.post('https://fcm.googleapis.com/fcm/send', body, options);
-        }).then(result => Promise.resolve(result.data));
+        }).then(result => {
+            insertIndividualHistory(null, receivers, data, NotiHistoryConstants.STATUS.SUCCESS);
+            return Promise.resolve(result.data);
+        }).catch(err => {
+            insertIndividualHistory(null, receivers, data, NotiHistoryConstants.STATUS.FAILURE);
+            return Promise.reject(err);
+        });
 };
 
 const requestByTopic = (topic, data) => {
@@ -69,7 +77,35 @@ const requestByTopic = (topic, data) => {
         };
 
         return axios.post('https://fcm.googleapis.com/v1/projects/'+ config.firebase.projectName +'/messages:send', body, options);
-    }).then(result => Promise.resolve(result.data));
+    }).then(result => {
+        insertTopicHistory(topic, null, data, NotiHistoryConstants.STATUS.SUCCESS);
+        return Promise.resolve(result.data);
+    }).catch(err => {
+        insertTopicHistory(topic, null, data, NotiHistoryConstants.STATUS.FAILURE);
+        return Promise.reject(err);
+    });
+};
+
+// 멀티 커넥션 점검 위한 임시 서비스 함수 insert***History
+const insertIndividualHistory = (when, receivers, data, status) => {
+    insertHistory(NotiHistoryConstants.TYPE.INDIVIDUAL, when, receivers, data, status);
+};
+
+const insertTopicHistory = (topic, when, data, status) => {
+    insertHistory(topic, when, null, data, status);
+};
+
+const insertHistory = (type, when, receivers, data, status) => {
+    new NotiHistories({
+        type : type,
+        when : ((when) ? new Date(when) : null),
+        receivers : receivers,
+        data : data,
+        createdAt : new Date(),
+        status : status
+    }).save()
+        .then(() => console.log("NotiHistory Inserted!"))
+        .catch(err => console.log(err));
 };
 
 module.exports = { request, requestByTopic };
