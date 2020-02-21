@@ -80,5 +80,6 @@ const getConnection = (connectionInfo) => {
 // 새 DB를 연결하고 싶다면, 아래에 add 함수로 호출하세요.
 // call `add` function if you want to connect new db.
 add('FOMES', config.fomesDbUrl);
+add('ADMIN', config.adminDbUrl);
 
 module.exports = connectionMap;
