@@ -65,6 +65,7 @@ const cancelReservedNoti = (req, res) => {
 
     const objectIds = req.body.map(id => mongoose.Types.ObjectId(id));
 
+    console.log(objectIds);
     agenda.cancel({_id: {$in: objectIds}})
         .then(numRemoved => {
             console.log(numRemoved);
@@ -75,5 +76,40 @@ const cancelReservedNoti = (req, res) => {
             res.status(500).json({error: err.message});
         });
 };
+const updateReservedNoti = (req, res) => {
+    console.log('updateReservedNoti');
+    console.log(req.body);
 
-module.exports = { sendNoti, sendNotiByTopic, getReservedNotiList, cancelReservedNoti };
+    let objectIds = [];
+    objectIds.push(req.body._id.toString());
+
+    agenda.cancel({_id: {$in: objectIds}})
+        .then(numRemoved => {
+            sendNoti(req, res);
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: err.message});
+        });
+
+};
+
+const updateReservedNotiByTopic = (req, res) => {
+    console.log('updateReservedNotiByTopic');
+    console.log(req.body);
+
+    let objectIds = [];
+    objectIds.push(req.body._id.toString());
+
+    agenda.cancel({_id: {$in: objectIds}})
+        .then(numRemoved => {
+            sendNotiByTopic(req, res);
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: err.message});
+        });
+
+};
+
+module.exports = { sendNoti, sendNotiByTopic, getReservedNotiList, cancelReservedNoti, updateReservedNoti, updateReservedNotiByTopic };
