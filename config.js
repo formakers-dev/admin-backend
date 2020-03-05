@@ -11,7 +11,7 @@ config.development = {
     // google_client_id: process.env.GOOGLE_CLIENT_ID,
     // google_client_secret: process.env.GOOGLE_CLIENT_SECRET,
     firebase_messaging: {
-        serverKey: process.env.SERVER_KEY
+        serverKey: process.env.FCM_SERVER_KEY
     },
     firebase: {
         projectName: process.env.FIREBASE_PROJECT_NAME,
