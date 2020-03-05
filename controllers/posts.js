@@ -29,4 +29,10 @@ const deletePosts = (req, res) => {
         .then(result => res.sendStatus(200))
         .catch(err => res.status(500).json({error: err.message}));
 };
-module.exports = { getPosts, registerPost, updatePost, deletePost, deletePosts };
+
+const updatePosts = (req, res) => {
+    PostsService.updatePosts(req)
+        .then(result => res.sendStatus(200))
+        .catch(err => res.status(500).json({error: err.message}));
+};
+module.exports = { getPosts, registerPost, updatePost, deletePost, deletePosts, updatePosts };
