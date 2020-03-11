@@ -1,8 +1,17 @@
 const mongoose = require('mongoose');
 const Posts = require('../models/posts');
 
-const findPublishablePosts = () => {
+const findAllPosts = () => {
     return Posts.find().sort({ order : 1 })
+};
+
+const findPublishablePosts = () => {
+    const currentDate = new Date();
+
+    return Posts.find({ $and: [
+            { openDate : { $lte : currentDate } },
+            { closeDate : { $gte : currentDate } }
+        ]}).sort({ order : 1 })
 };
 
 const insertPost = (post) => {
@@ -39,6 +48,7 @@ const updatePosts = (req) => {
 };
 
 module.exports = {
+    findAllPosts,
     findPublishablePosts,
     insertPost,
     updatePost,

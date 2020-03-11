@@ -1,7 +1,7 @@
 const PostsService = require('../services/posts');
 
 const getPosts = (req, res) => {
-    PostsService.findPublishablePosts()
+    PostsService.findAllPosts()
         .then(posts => res.json(posts))
         .catch(err => res.status(500).json({error: err.message}));
 };
