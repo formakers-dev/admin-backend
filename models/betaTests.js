@@ -42,10 +42,13 @@ const betaTestSchema = new Schema({
     _id: mongoose.Schema.Types.ObjectId,
     title: String,
     description: String,
+    subjectType: String,
+    plan: String,
     purpose: String,
     progressText: Object,
     tags: Array,
     overviewImageUrl: String,
+    coverImageUrl: String,
     iconImageUrl: String,
     openDate: Date,
     closeDate: Date,
@@ -53,7 +56,7 @@ const betaTestSchema = new Schema({
     afterService: afterServiceSchema,
     rewards: Rewards,
     missions: [MissionSchema],
-    apps: Array,
+    similarApps: Array,
     targetUserIds: false,
 });
 
