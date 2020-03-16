@@ -11,6 +11,7 @@ const notiRouter = require('./routes/noti');
 const postsRouter = require('./routes/posts');
 const betaTestsRouter = require('./routes/betaTests');
 const usersRouter = require('./routes/users');
+const appsRouter = require('./routes/apps');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/noti', notiRouter);
 app.use('/posts', postsRouter);
 app.use('/beta-test', betaTestsRouter);
 app.use('/users', usersRouter);
+app.use('/apps', appsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
