@@ -51,7 +51,7 @@ const jwtMiddleware = function (req, res, next) {
             next();
         }catch(err){
             console.error(err);
-            res.status(440).json({error:err});
+            res.sendStatus(500);
         }
     }else{
         if(req.path !== '/auth/login' && req.path !== '/auth/logout' && req.path !== '/auth/sign-up'){
