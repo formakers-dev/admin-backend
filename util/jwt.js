@@ -10,7 +10,7 @@ const generateToken = (res, payload) => {
     });
     res.cookie('access_token', token, {
         expires: new Date(Date.now() + JWT_CONSTANTS.expiration),
-        secure: false, //https option
+        secure: process.env.NODE_ENV === 'production', //https option
         httpOnly: true,
     });
     return token;
