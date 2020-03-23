@@ -46,7 +46,7 @@ const login = (req, res) => {
                     error: err.message
                 });
             });
-            JWT.generateToken(res,{id: result._id});
+            JWT.generateToken(req, res,{id: result._id});
             return res.sendStatus(200);
         } else {
             const prevInvalidCount = result.invalidPasswordCount;
