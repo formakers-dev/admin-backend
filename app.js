@@ -46,19 +46,21 @@ const jwtMiddleware = function (req, res, next) {
             const decodedToken = JWT.verify(cookies['access_token']);
             //만료시간 한시간 전에 API 요청이 왔다면, token 을 자동 갱신해준다.
             if(decodedToken.exp - Date.now()/1000 < 3600){
-                JWT.generateToken(res,{id: decodedToken.id});
+                JWT.generateToken(req, res,{id: decodedToken.id});
             }
             next();
         }catch(err){
             console.error(err);
             res.sendStatus(500);
+            next();
         }
     }else{
         if(req.path !== '/auth/login' && req.path !== '/auth/logout' && req.path !== '/auth/sign-up'){
-            res.status(440).json({error: '토큰 정보가 없습니다.'});
+            res.status(403).json({error: '토큰 정보가 없습니다.'});
         }
         next();
     }
+
 };
 app.use(jwtMiddleware);
 
