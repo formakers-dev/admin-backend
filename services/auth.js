@@ -5,7 +5,7 @@ const JWT = require('../util/jwt');
 
 const saltRounds = 10;
 const login = (req, res) => {
-    const account = req.body.account;
+    const account = req.body.email;
     const pw = req.body.password;
     Account.findOne({account: account}, (err, result) => {
         if (err) {
@@ -46,7 +46,8 @@ const login = (req, res) => {
                     error: err.message
                 });
             });
-            JWT.generateToken(req, res,{id: result._id});
+            const token =JWT.generateToken(req, res,{id: result._id});
+            res.setHeader('Authorization', token);
             return res.sendStatus(200);
         } else {
             const prevInvalidCount = result.invalidPasswordCount;
@@ -81,7 +82,7 @@ const login = (req, res) => {
 
 const signUp = (req, res) => {
     // password encryption
-    const account = req.body.account;
+    const account = req.body.email;
     const pw = req.body.password;
     const encryptedPw = bcrypt.hashSync(pw, saltRounds);
     Account.findOne({account: account}, (err, result) => {
