@@ -55,14 +55,14 @@ const jwtMiddleware = function (req, res, next) {
             next();
         }catch(err){
             console.error(err);
-            res.sendStatus(500);
-            next();
+            next(err);
         }
     }else{
-        if(req.path !== '/auth/login' && req.path !== '/auth/logout' && req.path !== '/auth/sign-up'){
-            res.status(403).json({error: '토큰 정보가 없습니다.'});
+        if(req.path !== '/api/auth/login' && req.path !== '/api/auth/logout' && req.path !== '/api/auth/sign-up'){
+            res.status(403).json({error:"토큰 정보가 없습니다."});
+        }else{
+            next();
         }
-        next();
     }
 
 };
@@ -78,13 +78,23 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/noti', notiRouter);
-app.use('/posts', postsRouter);
-app.use('/beta-test', betaTestsRouter);
-app.use('/users', usersRouter);
-app.use('/apps', appsRouter);
-app.use('/auth', authRouter);
+// /api 가 아닐 경우 index.html을 호출함
+const packagejson = require('./package.json');
+app.all("*",function(req,res,next){
+    if (req.originalUrl.startsWith('/api')) {
+        next();
+    } else {
+        res.render('index', { title: 'Fomes Admin Server - ' + process.env.NODE_ENV + ' (' + packagejson.version + ')' });
+    }
+});
+
+// app.use('/', indexRouter);
+app.use('/api/noti', notiRouter);
+app.use('/api/posts', postsRouter);
+app.use('/api/beta-test', betaTestsRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/apps', appsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

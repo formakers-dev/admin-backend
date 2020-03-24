@@ -11,15 +11,10 @@ const generateToken = (req, res, payload) => {
         const token = JWT.sign(payload, process.env.JWT_SECRET, {
             expiresIn: process.env.NODE_ENV === 'development' ? '1h' : '1d',
         });
-        // res.cookie('access_token', token, {
-        //     expires: new Date(Date.now() + JWT_CONSTANTS.expiration),
-        //     secure: config.frontendBaseUrl.startsWith('https'), //https option
-        //     httpOnly: true,
-        // });
         return token;
     }catch(err){
         console.error(err);
-        res.sendStatus(500);
+        throw err;
     }
 };
 
