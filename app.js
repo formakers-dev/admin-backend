@@ -17,14 +17,15 @@ const app = express();
 
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Origin', req.headers.origin);
+    res.header('Access-Control-Allow-Origin', req.header.origin);
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
     res.header('Access-Control-Allow-Headers', '*');
+    res.header('Access-Control-Expose-Headers', 'Authorization');
     next();
 });
 const corsOptions = {
     origin: config.frontendBaseUrl,
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
 if (config.web.cors) {
@@ -41,12 +42,14 @@ const jwtMiddleware = function (req, res, next) {
         const parts = cookie.split('=');
         cookies[parts.shift().trim()] = decodeURI(parts.join('='));
     });
-    if(cookies['access_token']){
+    if(cookies['access_token'] || req.headers.authorization){
         try{
-            const decodedToken = JWT.verify(cookies['access_token']);
+            const token = req.headers.authorization ? req.headers.authorization : cookies['access_token'];
+            const decodedToken = JWT.verify(token);
             //만료시간 한시간 전에 API 요청이 왔다면, token 을 자동 갱신해준다.
             if(decodedToken.exp - Date.now()/1000 < 3600){
-                JWT.generateToken(req, res,{id: decodedToken.id});
+                const token = JWT.generateToken(req, res,{id: decodedToken.id});
+                res.setHeader('Authorization', token);
             }
             next();
         }catch(err){
