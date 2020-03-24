@@ -33,6 +33,16 @@ if (config.web.cors) {
     app.use(cors(corsOptions));
 }
 
+// /api 가 아닐 경우 index.html을 호출함
+const packagejson = require('./package.json');
+app.all("*",function(req,res,next){
+    if (req.originalUrl.startsWith('/api')) {
+        next();
+    } else {
+        res.render('index', { title: 'Fomes Admin Server - ' + process.env.NODE_ENV + ' (' + packagejson.version + ')' });
+    }
+});
+
 // jwt middleware
 const JWT = require('./util/jwt');
 const jwtMiddleware = function (req, res, next) {
@@ -76,16 +86,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-// /api 가 아닐 경우 index.html을 호출함
-const packagejson = require('./package.json');
-app.all("*",function(req,res,next){
-    if (req.originalUrl.startsWith('/api')) {
-        next();
-    } else {
-        res.render('index', { title: 'Fomes Admin Server - ' + process.env.NODE_ENV + ' (' + packagejson.version + ')' });
-    }
-});
 
 // app.use('/', indexRouter);
 app.use('/api/noti', notiRouter);
