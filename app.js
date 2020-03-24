@@ -6,7 +6,6 @@ const logger = require('morgan');
 const cors = require('cors');
 
 const config = require('./config');
-const indexRouter = require('./routes/index');
 const notiRouter = require('./routes/noti');
 const postsRouter = require('./routes/posts');
 const betaTestsRouter = require('./routes/betaTests');
