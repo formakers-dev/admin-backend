@@ -13,7 +13,7 @@ const generateToken = (req, res, payload) => {
             expires: new Date(Date.now() + JWT_CONSTANTS.expiration),
             secure: req.headers.origin.startsWith('https'), //https option
             httpOnly: true,
-            SameSite: 'None',
+            sameSite: 'none',
         });
         return token;
     }catch(err){
