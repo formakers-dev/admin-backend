@@ -21,8 +21,14 @@ const getUser = (req, res) => {
 };
 
 const getUsers = (req, res) => {
+    const type = req.body.type;
     const keywords = req.body.keywords;
-    Users.find({email: {$in:keywords}},(err, result)=>{
+    if(type !=='email' && type !=='userId' && type !=='nickName'){
+        return res.status(400).json({error:'잘못된 타입입니다.'});
+    }
+    const filter = {};
+    filter[type] = {$in: keywords};
+    Users.find(filter,(err, result)=>{
         if(err){
             console.error(error);
             throw err;
