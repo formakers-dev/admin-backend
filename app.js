@@ -12,9 +12,10 @@ const betaTestsRouter = require('./routes/betaTests');
 const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
 const appsRouter = require('./routes/apps');
+const history = require('connect-history-api-fallback');
 
 const app = express();
-
+app.use(history());
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', req.header.origin);
