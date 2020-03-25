@@ -15,18 +15,7 @@ const appsRouter = require('./routes/apps');
 const history = require('connect-history-api-fallback');
 
 const app = express();
-app.use(history(
-    {
-        index: '/index.html',
-        rewrites: [
-            {
-                // from: /^\/api\/.*$/,
-                from: '/login',
-                to: '/'
-            }
-        ]
-    }
-));
+
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', req.header.origin);
@@ -45,15 +34,6 @@ if (config.web.cors) {
     app.use(cors(corsOptions));
 }
 
-// /api 가 아닐 경우 index.html을 호출함
-// const packagejson = require('./package.json');
-// app.all("*",function(req,res,next){
-//     if (req.originalUrl.startsWith('/api')) {
-//         next();
-//     } else {
-//         res.render('index', { title: 'Fomes Admin Server - ' + process.env.NODE_ENV + ' (' + packagejson.version + ')' });
-//     }
-// });
 
 // jwt middleware
 const JWT = require('./util/jwt');
@@ -88,6 +68,23 @@ const jwtMiddleware = function (req, res, next) {
 
 };
 app.use(jwtMiddleware);
+app.use(history(
+    {
+        index: '/index.html',
+        rewrites: [
+            {
+                // from: /^\/api\/.*$/,
+                from: '/login',
+                to: '/'
+            }
+        ]
+    }
+));
+// /api 가 아닐 경우 index.html을 호출함
+const packagejson = require('./package.json');
+app.get("/",function(req,res,next){
+    res.render('index', { title: 'Fomes Admin Server - ' + process.env.NODE_ENV + ' (' + packagejson.version + ')' });
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
