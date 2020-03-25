@@ -22,10 +22,7 @@ app.use(history(
             {
                 // from: /^\/api\/.*$/,
                 from: '/login',
-                to: function(context) {
-                    console.log(context);
-                    return '/index.html';
-                }
+                to: '/'
             }
         ]
     }
