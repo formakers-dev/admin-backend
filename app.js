@@ -34,7 +34,6 @@ if (config.web.cors) {
     app.use(cors(corsOptions));
 }
 
-
 // jwt middleware
 const JWT = require('./util/jwt');
 const jwtMiddleware = function (req, res, next) {
@@ -68,24 +67,6 @@ const jwtMiddleware = function (req, res, next) {
 
 };
 app.use(jwtMiddleware);
-app.use(history(
-    {
-        index: '/index.html',
-        rewrites: [
-            {
-                // from: /^\/api\/.*$/,
-                from: '/login',
-                to: '/'
-            }
-        ]
-    }
-));
-// /api 가 아닐 경우 index.html을 호출함
-const packagejson = require('./package.json');
-app.get("/",function(req,res,next){
-    res.render('index', { title: 'Fomes Admin Server - ' + process.env.NODE_ENV + ' (' + packagejson.version + ')' });
-});
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -94,7 +75,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 // app.use('/', indexRouter);
 app.use('/api/noti', notiRouter);
@@ -103,6 +83,13 @@ app.use('/api/beta-test', betaTestsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/apps', appsRouter);
+app.use(history());
+app.use(express.static(path.join(__dirname, 'public')));
+// /api 가 아닐 경우 index.html을 호출함
+// const packagejson = require('./package.json');
+// app.get("/",function(req,res,next){
+//     res.render('index', { title: 'Fomes Admin Server - ' + process.env.NODE_ENV + ' (' + packagejson.version + ')' });
+// });
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
