@@ -84,7 +84,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/apps', appsRouter);
 app.use(history());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'dist')));
 // /api 가 아닐 경우 index.html을 호출함
 // const packagejson = require('./package.json');
 // app.get("/",function(req,res,next){
