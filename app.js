@@ -6,6 +6,7 @@ const logger = require('morgan');
 const cors = require('cors');
 
 const config = require('./config');
+const indexRouter = require('./routes/indexRouter');
 const notiRouter = require('./routes/noti');
 const postsRouter = require('./routes/posts');
 const betaTestsRouter = require('./routes/betaTests');
@@ -33,6 +34,7 @@ if (config.web.cors) {
     app.options('*', cors(corsOptions));
     app.use(cors(corsOptions));
 }
+
 
 // jwt middleware
 const JWT = require('./util/jwt');
@@ -67,6 +69,12 @@ const jwtMiddleware = function (req, res, next) {
 
 };
 app.use(jwtMiddleware);
+// /api 가 아닐 경우 index.html을 호출함
+// const packagejson = require('./package.json');
+// app.get("/",function(req,res,next){
+//     res.render('index', { title: 'Fomes Admin Server - ' + process.env.NODE_ENV + ' (' + packagejson.version + ')' });
+// });
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -75,8 +83,9 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', indexRouter);
+
 app.use('/api/noti', notiRouter);
 app.use('/api/posts', postsRouter);
 app.use('/api/beta-test', betaTestsRouter);
@@ -84,13 +93,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/apps', appsRouter);
 app.use(history());
-app.use(express.static(path.join(__dirname, 'dist')));
-// /api 가 아닐 경우 index.html을 호출함
-// const packagejson = require('./package.json');
-// app.get("/",function(req,res,next){
-//     res.render('index', { title: 'Fomes Admin Server - ' + process.env.NODE_ENV + ' (' + packagejson.version + ')' });
-// });
-
+app.use('/', indexRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));
