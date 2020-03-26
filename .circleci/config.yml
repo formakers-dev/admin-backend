@@ -102,8 +102,8 @@ workflows:
       - dev-deploy:
           filters:
             branches:
-              only:
-                - master
+              - master
+              - jo
       - stg-deploy:
           requires:
             - dev-deploy
