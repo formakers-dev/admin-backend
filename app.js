@@ -61,6 +61,7 @@ const jwtMiddleware = function (req, res, next) {
             next();
         }catch(err){
             console.error(err);
+            res.clearCookie("access_token");
             next(err);
         }
     }else{
