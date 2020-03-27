@@ -104,6 +104,7 @@ workflows:
             branches:
               only:
                 - master
+                - jo
       - stg-deploy:
           requires:
             - dev-deploy
