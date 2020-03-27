@@ -9,7 +9,7 @@ const JWT_CONSTANTS = {
 const generateToken = (req, res, payload) => {
     try{
         const token = JWT.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: process.env.NODE_ENV === 'development' ? 3600000 : 86400000,
+            expiresIn: JWT_CONSTANTS.expiration
         });
         return token;
     }catch(err){
