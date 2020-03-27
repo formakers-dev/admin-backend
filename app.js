@@ -16,6 +16,7 @@ const appsRouter = require('./routes/apps');
 const history = require('connect-history-api-fallback');
 
 const app = express();
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
@@ -25,6 +26,7 @@ app.use(function(req, res, next) {
     res.header('Access-Control-Expose-Headers', 'Authorization');
     next();
 });
+
 const corsOptions = {
     origin: config.frontendBaseUrl,
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
@@ -51,12 +53,15 @@ const jwtMiddleware = function (req, res, next) {
             const decodedToken = JWT.verify(token);
             //만료시간 한시간 전에 API 요청이 왔다면, token 을 자동 갱신해준다.
             if(decodedToken.exp - Date.now()/1000 < 3600){
-                const token = JWT.generateToken(req, res,{id: decodedToken.id});
+                const newToken = JWT.generateToken(req, res,{id: decodedToken.id});
+                res.setHeader('Authorization', newToken);
+            }else{
                 res.setHeader('Authorization', token);
             }
             next();
         }catch(err){
             console.error(err);
+            res.clearCookie("access_token");
             next(err);
         }
     }else{
@@ -78,7 +83,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/', indexRouter);
 app.use('/api/noti', notiRouter);
@@ -87,7 +92,7 @@ app.use('/api/beta-test', betaTestsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/apps', appsRouter);
-app.use(history());
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     console.log("error");
