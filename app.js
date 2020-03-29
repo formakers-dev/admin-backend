@@ -60,9 +60,12 @@ const jwtMiddleware = function (req, res, next) {
             }
             next();
         }catch(err){
-            console.error(err);
+            if(err.name !== 'TokenExpiredError'){
+                console.error(err.message);
+            }
             res.clearCookie("access_token");
-            next(err);
+            res.removeHeader('Authorization');
+            res.status(403).json({error:"유효하지 않는 토큰 정보입니다."});
         }
     }else{
         if(req.path !== '/api/auth/login' && req.path !== '/api/auth/logout' && req.path !== '/api/auth/sign-up'){

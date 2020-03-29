@@ -6,12 +6,10 @@ const JWT_CONSTANTS = {
 };
 const generateToken = (req, res, payload) => {
     try{
-        const token = JWT.sign(payload, process.env.JWT_SECRET, {
+        return JWT.sign(payload, process.env.JWT_SECRET, {
             expiresIn: '1d'
         });
-        return token;
     }catch(err){
-        console.error(err);
         throw err;
     }
 };
