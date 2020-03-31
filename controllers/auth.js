@@ -1,7 +1,6 @@
 const AuthService = require('../services/auth');
 
 const login = (req, res) => {
-    console.log('login');
     try{
         return AuthService.login(req,res);
     }catch(err){
@@ -10,7 +9,6 @@ const login = (req, res) => {
     }
 };
 const signUp = (req, res) => {
-    console.log('signUp');
     try{
         return AuthService.signUp(req, res);
     }catch(err){
@@ -20,7 +18,6 @@ const signUp = (req, res) => {
 };
 
 const logout = (req, res) => {
-    console.log('logout');
     try{
         return AuthService.logout(req, res);
     }catch(err){

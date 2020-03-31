@@ -1,15 +1,21 @@
 const UsersService = require('../services/users');
 
-const getUser = (req, res) => {
+const getUsers = (req, res) => {
     try{
-        return UsersService.getUser(req, res);
+        if(req.query.type && req.query.keyword){
+            console.log('getUser');
+            return UsersService.getUser(req, res);
+        }else{
+            console.log('get all Users');
+            return UsersService.getAllUsers(req, res);
+        }
     }catch(err){
         console.error(err);
         return res.status(500).json({error : err.message});
     }
 };
 
-const getUsers = (req, res) => {
+const getUsersByFilter = (req, res) => {
     try{
         return UsersService.getUsers(req, res);
     }catch(err){
@@ -18,4 +24,14 @@ const getUsers = (req, res) => {
     }
 };
 
-module.exports = { getUser, getUsers };
+const getAllUsers = (req, res) => {
+    try{
+        console.log('getAllUsers');
+        return UsersService.getAllUsers(req, res);
+    }catch(err){
+        console.error(err);
+        return res.status(500).json({error : err.message});
+    }
+};
+
+module.exports = { getUsers, getUsersByFilter, getAllUsers };

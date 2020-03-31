@@ -115,6 +115,7 @@ const signUp = (req, res) => {
 
 const logout = (req, res) => {
     res.clearCookie('access_token');
+    res.removeHeader('Authorization');
     return res.sendStatus(204);
 }
 

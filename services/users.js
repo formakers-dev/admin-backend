@@ -40,7 +40,19 @@ const getUsers = (req, res) => {
     });
 };
 
+const getAllUsers = (req, res) => {
+    Users.find().then(result => {
+        if(!result){
+            return res.sendStatus(204);
+        }
+        return res.status(200).json(result);
+    }).catch(error => {
+        console.error(error);
+        throw error;
+    });
+};
+
 module.exports = {
-    getUser, getUsers
+    getUser, getUsers, getAllUsers
 };
 
