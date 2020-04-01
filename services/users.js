@@ -28,7 +28,11 @@ const getUsers = (req, res) => {
     }
     const filter = {};
     filter[type] = {$in: keywords};
-    Users.find(filter,(err, result)=>{
+
+    const options = {
+        lean : true
+    };
+    Users.find(filter,null,options,(err, result)=>{
         if(err){
             console.error(error);
             throw err;
@@ -41,7 +45,7 @@ const getUsers = (req, res) => {
 };
 
 const getAllUsers = (req, res) => {
-    Users.find().then(result => {
+    Users.find().lean().then(result => {
         if(!result){
             return res.sendStatus(204);
         }

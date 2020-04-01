@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Posts = require('../models/posts');
 
 const findAllPosts = () => {
-    return Posts.find().sort({ order : 1 })
+    return Posts.find().lean().sort({ order : 1 })
 };
 
 const findPublishablePosts = () => {
