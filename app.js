@@ -13,6 +13,7 @@ const betaTestsRouter = require('./routes/betaTests');
 const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
 const appsRouter = require('./routes/apps');
+const requestsRouter = require('./routes/requests');
 const history = require('connect-history-api-fallback');
 
 const app = express();
@@ -95,6 +96,7 @@ app.use('/api/beta-test', betaTestsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/apps', appsRouter);
+app.use('/api/requests', requestsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
