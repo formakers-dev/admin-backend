@@ -8,6 +8,8 @@ config.development = {
     agendaDbUrl: process.env.AGENDA_DB_URL,
     adminDbUrl: process.env.ADMIN_DB_URL,
 
+    jwtSecret: process.env.JWT_SECRET,
+
     // google_client_id: process.env.GOOGLE_CLIENT_ID,
     // google_client_secret: process.env.GOOGLE_CLIENT_SECRET,
     firebase_messaging: {
@@ -34,6 +36,8 @@ config.test = {
     agendaDbUrl: process.env.AGENDA_DB_URL,
     adminDbUrl: process.env.ADMIN_DB_URL,
 
+    jwtSecret: 'testJwtSecret',
+
     // google_client_id: 'testClientId',
     // google_client_secret: 'testClientSecret',
     firebase_messaging: {
@@ -48,6 +52,13 @@ config.test = {
     // testCustomerId: 'googleTestCustomerId',
     // testCustomerName: 'TestCustomer',
     // testProjectId: 99999999,
+    testUser: {
+        account: 'test@user.com',
+        status: 'active',
+    },
+    accessToken: {
+        valid: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOGQ3ZDI4ZTEwNWViMjgzOTkwZDI5NyIsImlhdCI6MTU4NjMzMTg5MSwiZXhwIjoxNzQ0MTE5ODkxfQ.mMnIbFMiIBsL3RT--k2A0xzS1InMqqhXAtvPEcDcbco'
+    },
     web: {}
 };
 

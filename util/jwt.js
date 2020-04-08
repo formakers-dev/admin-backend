@@ -6,7 +6,7 @@ const JWT_CONSTANTS = {
 };
 const generateToken = (req, res, payload) => {
     try{
-        return JWT.sign(payload, process.env.JWT_SECRET, {
+        return JWT.sign(payload, config.jwtSecret, {
             expiresIn: '1d'
         });
     }catch(err){
@@ -15,7 +15,7 @@ const generateToken = (req, res, payload) => {
 };
 
 const verify = (token) => {
-    return JWT.verify(token, process.env.JWT_SECRET);
+    return JWT.verify(token, config.jwtSecret);
 }
 module.exports = {
     generateToken, verify, JWT_CONSTANTS
