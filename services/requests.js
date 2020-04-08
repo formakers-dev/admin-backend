@@ -2,6 +2,7 @@ const Requests = require('../models/requests');
 const NotFoundError = require('../util/error').NotFoundError;
 
 const getRequests = () => {
+    console.log('getRequests');
     return Requests.find({}, {
             "date" : 1,
             "status" : 1,
@@ -22,6 +23,7 @@ const getRequests = () => {
 };
 
 const getRequest = (id) => {
+    console.log('getRequest');
     return Requests.findOne({_id : id})
         .then(request => {
             if (request)
@@ -32,8 +34,48 @@ const getRequest = (id) => {
         .catch(err => Promise.reject(err));;
 };
 
+const insertRequest = (request) => {
+    console.log('insertRequest');
+    return new Requests({
+        date : request.date,
+        status : 'received',
+        purpose : request.betaTest.purpose,
+        plan : request.betaTest.plan,
+        numberOfTester : request.numberOfTester,
+        openDate : request.betaTest.openDate,
+        duration : request.betaTest.duration,
+        additionalInfo : request.betaTest.additionalInfo,
+        isIncludedUserData : request.isIncludedUserData,
+        isIncludedCustomizing : request.customizing.isIncluded,
+        customizingManagerEmails : request.customizing.managerEmails,
+        game : {
+            title : request.game.title,
+            tags : request.game.tags,
+            description : request.game.description,
+            downloadUrl : request.game.downloadUrl,
+            packageName : request.game.packageName,
+            devProcess : request.game.devProcess,
+        },
+        company : {
+            name : request.customer.company.name,
+            class : request.customer.company.class,
+            numberOfEmployee : request.customer.company.numberOfEmployee,
+        },
+        customer : {
+            referers : request.customer.referers,
+            name : request.customer.name,
+            role : request.customer.role,
+            phoneNumber : request.customer.phoneNumber,
+            email : request.customer.email,
+        },
+        operatorAccountId : null,
+        operatorName : null
+    }).save();
+};
+
 module.exports = {
     getRequests,
-    getRequest
+    getRequest,
+    insertRequest
 };
 

@@ -27,7 +27,6 @@ const customer = {
 };
 
 const requestSchema = new Schema({
-    _id: mongoose.Schema.Types.ObjectId,
     date: Date,
     status: String,
     purpose: String,
