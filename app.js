@@ -38,47 +38,6 @@ if (config.web.cors) {
     app.use(cors(corsOptions));
 }
 
-
-// jwt middleware
-const JWT = require('./util/jwt');
-const jwtMiddleware = function (req, res, next) {
-    const cookies = {};
-    const rawCookies = req.headers.cookie;
-    rawCookies && rawCookies.split(';').forEach(function( cookie ) {
-        const parts = cookie.split('=');
-        cookies[parts.shift().trim()] = decodeURI(parts.join('='));
-    });
-    if(cookies['access_token'] || req.headers.authorization){
-        try{
-            const token = req.headers.authorization ? req.headers.authorization : cookies['access_token'];
-            const decodedToken = JWT.verify(token);
-            //만료시간 한시간 전에 API 요청이 왔다면, token 을 자동 갱신해준다.
-            if(decodedToken.exp - Date.now()/1000 < 3600){
-                const newToken = JWT.generateToken(req, res,{id: decodedToken.id});
-                res.setHeader('Authorization', newToken);
-            }else{
-                res.setHeader('Authorization', token);
-            }
-            next();
-        }catch(err){
-            if(err.name !== 'TokenExpiredError'){
-                console.error(err.message);
-            }
-            res.clearCookie("access_token");
-            res.removeHeader('Authorization');
-            res.status(403).json({error:"유효하지 않는 토큰 정보입니다."});
-        }
-    }else{
-        if(req.path !== '/api/auth/login' && req.path !== '/api/auth/logout' && req.path !== '/api/auth/sign-up'){
-            res.status(403).json({error:"토큰 정보가 없습니다."});
-        }else{
-            next();
-        }
-    }
-
-};
-app.use(jwtMiddleware);
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
