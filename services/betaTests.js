@@ -1,12 +1,8 @@
-const ObjectId = require('mongoose').Types.ObjectId;
+const MongooseUtil = require('../util/mongoose');
 const BetaTests = require('../models/betaTests');
 
-const getNewObjectId = () => {
-    return new ObjectId();
-};
-
 const insertBetaTest = (betaTest) => {
-    betaTest._id = getNewObjectId();
+    betaTest._id = MongooseUtil.getNewObjectId();
     return new BetaTests(betaTest).save();
 };
 
@@ -15,7 +11,6 @@ const findAllBetaTest = () => {
 };
 
 module.exports = {
-    getNewObjectId,
     insertBetaTest,
     findAllBetaTest,
 };

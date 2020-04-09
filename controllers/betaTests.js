@@ -1,11 +1,12 @@
 const BetaTestService = require('../services/betaTests');
+const MongooseUtil = require('../util/mongoose');
 
 const registerBetaTest = (req, res) => {
     const betaTest = req.body;
 
     betaTest.missions = betaTest.missions.map(mission => {
-        mission._id = BetaTestService.getNewObjectId();
-        mission.item._id = BetaTestService.getNewObjectId();
+        mission._id = MongooseUtil.getNewObjectId();
+        mission.item._id = MongooseUtil.getNewObjectId();
         mission.items = [ mission.item ];
         delete mission.item;
         return mission;
