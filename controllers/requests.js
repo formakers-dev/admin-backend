@@ -26,8 +26,19 @@ const registerRequest = (req, res) => {
         .catch(err => res.status(500).json({error: err.message}));
 };
 
+const updateRequest = (req, res) =>{
+    RequestService.updateRequest(req).then(result => res.sendStatus(200))
+        .catch(err => res.status(500).json({error: err.message}));
+};
+
+const cancelRequest = (req, res) =>{
+    RequestService.cancelRequest(req).then(result => res.sendStatus(200))
+        .catch(err => res.status(500).json({error: err.message}));
+};
 module.exports = {
     getRequests,
     getRequest,
-    registerRequest
+    registerRequest,
+    updateRequest,
+    cancelRequest
 };

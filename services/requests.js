@@ -73,9 +73,21 @@ const insertRequest = (request) => {
     }).save();
 };
 
+const updateRequest = (req) => {
+    console.log('updateRequest');
+    return Requests.replaceOne({_id: req.params.id}, req.body);
+};
+
+const cancelRequest = (req) => {
+    console.log('updateRequest');
+    return Requests.updateOne({_id: req.params.id}, {$set: {status:'cancel'}});
+};
+
 module.exports = {
     getRequests,
     getRequest,
-    insertRequest
+    insertRequest,
+    updateRequest,
+    cancelRequest
 };
 
