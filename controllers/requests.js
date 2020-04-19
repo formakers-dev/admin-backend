@@ -23,7 +23,10 @@ const getRequest = (req, res) => {
 const registerRequest = (req, res) => {
     RequestService.insertRequest(req.body)
         .then(result => res.sendStatus(200))
-        .catch(err => res.status(500).json({error: err.message}));
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({error: err.message})
+        });
 };
 
 const updateRequest = (req, res) =>{
