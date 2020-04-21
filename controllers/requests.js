@@ -24,18 +24,20 @@ const registerRequest = (req, res) => {
     RequestService.insertRequest(req.body)
         .then(result => res.sendStatus(200))
         .catch(err => {
-            console.log(err)
+            console.log(err);
             res.status(500).json({error: err.message})
         });
 };
 
 const updateRequest = (req, res) =>{
-    RequestService.updateRequest(req).then(result => res.sendStatus(200))
+    RequestService.updateRequest(req.params.id, req.body)
+        .then(result => res.sendStatus(200))
         .catch(err => res.status(500).json({error: err.message}));
 };
 
 const cancelRequest = (req, res) =>{
-    RequestService.cancelRequest(req).then(result => res.sendStatus(200))
+    RequestService.cancelRequest(req.params.id)
+        .then(result => res.sendStatus(200))
         .catch(err => res.status(500).json({error: err.message}));
 };
 module.exports = {

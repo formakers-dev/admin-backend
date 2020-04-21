@@ -29,6 +29,7 @@ const customer = {
 const requestSchema = new Schema({
     date: Date,
     status: String,
+    isCancelled: Boolean,
     purpose: String,
     plan: String,
     numberOfTester: Number,
