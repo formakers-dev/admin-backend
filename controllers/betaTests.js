@@ -1,15 +1,8 @@
 const BetaTestService = require('../services/betaTests');
 
 const registerBetaTest = (req, res) => {
+    console.log('registerBetaTest');
     const betaTest = req.body;
-
-    betaTest.missions = betaTest.missions.map(mission => {
-        mission._id = BetaTestService.getNewObjectId();
-        mission.item._id = BetaTestService.getNewObjectId();
-        mission.items = [ mission.item ];
-        delete mission.item;
-        return mission;
-    });
 
     BetaTestService.insertBetaTest(betaTest)
         .then(result => {

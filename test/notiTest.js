@@ -99,7 +99,9 @@ describe('Notification', () => {
         });
 
         it('예약한 알림 리스트를 전달한다', done => {
-            request.get('/noti/reserved')
+            console.log(config.accessToken.valid);
+            request.get('/api/noti/reserved')
+                .set('Authorization', config.accessToken.valid)
                 .expect(200)
                 .then(res => {
                     console.log(res.body);
@@ -158,7 +160,8 @@ describe('Notification', () => {
                     status: 200
                 });
 
-                request.post('/noti')
+                request.post('/api/noti')
+                    .set('Authorization', config.accessToken.valid)
                     .expect(200)
                     .send(body)
                     .then(() => {
@@ -195,7 +198,8 @@ describe('Notification', () => {
 
                 body.when = new Date('2019-03-14T15:30:00.000Z');
 
-                request.post('/noti')
+                request.post('/api/noti')
+                    .set('Authorization', config.accessToken.valid)
                     .expect(200)
                     .send(body)
                     .then(() => {
@@ -245,7 +249,8 @@ describe('Notification', () => {
                     status: 200
                 });
 
-                request.post('/noti')
+                request.post('/api/noti')
+                    .set('Authorization', config.accessToken.valid)
                     .expect(200)
                     .send(body)
                     .then(() => {
@@ -282,7 +287,8 @@ describe('Notification', () => {
 
                 body.when = new Date('2019-03-14T15:30:00.000Z');
 
-                request.post('/noti')
+                request.post('/api/noti')
+                    .set('Authorization', config.accessToken.valid)
                     .expect(200)
                     .send(body)
                     .then(() => {
@@ -334,7 +340,8 @@ describe('Notification', () => {
                 const stubAxiosPost = sandbox.stub(axios, 'post')
                     .returns(Promise.resolve({data: 'test'}));
 
-                request.post('/noti')
+                request.post('/api/noti')
+                    .set('Authorization', config.accessToken.valid)
                     .expect(200)
                     .send(body)
                     .then(() => {
@@ -400,7 +407,8 @@ describe('Notification', () => {
         });
 
         it('해당 topic을 구독하는 사용자들에게 알림을 전송한다', done => {
-            request.post('/noti/topics/notice-all')
+            request.post('/api/noti/topics/notice-all')
+                .set('Authorization', config.accessToken.valid)
                 .expect(200)
                 .send(body)
                 .then(() => {
@@ -434,7 +442,8 @@ describe('Notification', () => {
 
             body.when = new Date('2019-03-14T15:30:00.000Z');
 
-            request.post('/noti/topics/notice-all')
+            request.post('/api/noti/topics/notice-all')
+                .set('Authorization', config.accessToken.valid)
                 .expect(200)
                 .send(body)
                 .then(() => {
@@ -505,7 +514,8 @@ describe('Notification', () => {
             agenda.jobs({'data.data.title': '타이틀2'}).then(jobs => {
                 const idsToCancel = jobs.map(job => job.attrs._id);
                 console.log('idsToCancel', idsToCancel);
-                return request.post('/noti/reserved/cancel')
+                return request.post('/api/noti/reserved/cancel')
+                    .set('Authorization', config.accessToken.valid)
                     .expect(200)
                     .send(idsToCancel);
             }).then(() => {
