@@ -11,12 +11,14 @@ const Constants = {
         ACTIVE : 'active',
         INACTIVE : 'inactive',
         LOCKED : 'locked',
-    }
+    },
+    SALT_ROUNDS: 10
 };
 
 const schema = new mongoose.Schema({
     account : String,
     password : String,
+    nickName: String,
     role : String,
     status : String,
     invalidPasswordCount: Number,

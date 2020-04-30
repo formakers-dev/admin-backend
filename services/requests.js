@@ -16,7 +16,8 @@ const getRequests = () => {
             "game.title" : 1,
             "game.devProcess" : 1,
             "company.name" : 1,
-            "company.numberOfEmployee" : 1
+            "company.numberOfEmployee" : 1,
+            "isCancelled": 1
         })
         .lean()
         .sort({ date : -1 });
@@ -70,7 +71,8 @@ const insertRequest = (request) => {
                 email : request.customer.email,
             },
             operatorAccountId : request.operatorAccountId,
-            operatorName : request.operatorName
+            operatorName : request.operatorName,
+            isCancelled: request.isCancelled
         };
         return new Requests(data).save();
     }catch(err){
