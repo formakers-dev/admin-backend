@@ -3,7 +3,6 @@ const Constants = require('../models/account').Constants;
 const bcrypt = require('bcrypt');
 const JWT = require('../util/jwt');
 
-const saltRounds = 10;
 const login = (req, res) => {
     const account = req.body.email;
     const pw = req.body.password;
@@ -84,7 +83,7 @@ const signUp = (req, res) => {
     // password encryption
     const account = req.body.email;
     const pw = req.body.password;
-    const encryptedPw = bcrypt.hashSync(pw, saltRounds);
+    const encryptedPw = bcrypt.hashSync(pw, Constants.SALT_ROUNDS);
     Account.findOne({account: account}, (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -122,6 +121,7 @@ const logout = (req, res) => {
 const check = (req, res) => {
     return res.sendStatus(200);
 }
+
 
 module.exports = {
     login, signUp, logout, check

@@ -29,4 +29,5 @@ const logout = (req, res) => {
 const check = (req, res) => {
     return AuthService.check(req, res);
 }
+
 module.exports = { login, signUp, logout, check };
