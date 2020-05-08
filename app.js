@@ -18,7 +18,7 @@ const adminRouter = require('./routes/admin'); //admin 관련 정보를 위한 �
 const history = require('connect-history-api-fallback');
 
 const app = express();
-app.use(history());
+// app.use(history());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req, res, next) {
