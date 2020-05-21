@@ -27,7 +27,8 @@ const findAllBetaTest = () => {
         'closeDate':1,
         'plan':1,
         'iconImageUrl':1,
-        'status':1
+        'status':1,
+        'subjectType':1
     }).lean().sort({openDate: -1});
 };
 
