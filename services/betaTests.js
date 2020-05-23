@@ -1,6 +1,7 @@
 const MongooseUtil = require('../util/mongoose');
 const BetaTests = require('../models/betaTests');
 const BetaTestMissions = require('../models/betaTestMissions');
+const Epilogues = require('../models/epilogues');
 
 const insertBetaTest = (betaTest) => {
     console.info('Try to insert BetaTest...');
@@ -69,11 +70,14 @@ const findBetaTest = (id) => {
     const promises = [];
     const betaTest = BetaTests.findOne({_id:id});
     const missions = BetaTestMissions.find({betaTestId:id}).lean().sort({order:1});
+    const epilogues = Epilogues.findOne({betaTestId: id});
     promises.push(betaTest);
     promises.push(missions);
+    promises.push(epilogues);
     return Promise.all(promises).then(results =>{
         const data = Object.assign({}, results[0]._doc);
         data['missions'] = results[1];
+        data['epilogue'] = results[2];
         console.log('result',data);
         return Promise.resolve(data);
     }).catch(err => Promise.reject(err));
