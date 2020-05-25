@@ -78,7 +78,6 @@ const findBetaTest = (id) => {
         const data = Object.assign({}, results[0]._doc);
         data['missions'] = results[1];
         data['epilogue'] = results[2];
-        console.log('result',data);
         return Promise.resolve(data);
     }).catch(err => Promise.reject(err));
 };
