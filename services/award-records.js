@@ -1,9 +1,20 @@
 const AwardRecords = require('../models/award-records');
+const BetaTests = require('../models/betaTests');
 const Users = require('../models/users').Users;
 
 const getAwardRecords = (req) => {
     const filter = req.query ? req.query : {};
-    return AwardRecords.find(filter).lean();
+    const promises = [];
+    const betaTest = BetaTests.findOne({_id : filter.betaTestId});
+    const awardRecords = AwardRecords.find(filter).lean();
+    promises.push(betaTest);
+    promises.push(awardRecords);
+    return Promise.all(promises).then(results =>{
+        const data = {};
+        data['betaTest'] = results[0];
+        data['awardRecords'] = results[1];
+        return Promise.resolve(data);
+    }).catch(err => Promise.reject(err));
 };
 
 const registerAwardRecords = (req, res) => {
@@ -18,7 +29,7 @@ const registerAwardRecords = (req, res) => {
     const options = {
         lean : true
     };
-    Users.find(filter,null,options,(err, result)=>{
+    Users.find(filter,{userId:1,nickName:1, email:1},options,(err, result)=>{
         if(err){
             console.error(error);
             throw err;
@@ -39,8 +50,8 @@ const registerAwardRecords = (req, res) => {
                 }
             });
         })
-        AwardRecords.insertMany(data).then(r=>{
-            return res.status(200).json(data);
+        AwardRecords.insertMany(data).then(insertResult=>{
+            return res.status(200).json(result);
         }).catch(e=>{
             throw e;
         });
@@ -48,7 +59,6 @@ const registerAwardRecords = (req, res) => {
 };
 
 const updateAwardRecords = (req) => {
-    console.log(req.body);
     return AwardRecords.replaceOne({_id: req.body._id}, req.body);
 };
 

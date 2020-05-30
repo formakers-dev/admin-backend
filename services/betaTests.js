@@ -70,14 +70,11 @@ const findBetaTest = (id) => {
     const promises = [];
     const betaTest = BetaTests.findOne({_id:id});
     const missions = BetaTestMissions.find({betaTestId:id}).lean().sort({order:1});
-    const epilogues = Epilogues.findOne({betaTestId: id});
     promises.push(betaTest);
     promises.push(missions);
-    promises.push(epilogues);
     return Promise.all(promises).then(results =>{
         const data = Object.assign({}, results[0]._doc);
         data['missions'] = results[1];
-        data['epilogue'] = results[2];
         return Promise.resolve(data);
     }).catch(err => Promise.reject(err));
 };
