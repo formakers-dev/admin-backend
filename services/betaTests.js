@@ -43,13 +43,11 @@ const processMissions = (betaTestId, missions, type) => {
     }else if(type === 'update'){
         return BetaTestMissions.deleteMany({betaTestId: betaTestId}).then(result=>{
             const data = missions.map(mission => {
-                mission._id = MongooseUtil.getNewObjectId();
                 mission.betaTestId = betaTestId;
                 return mission;
             });
-            console.log('insert', data);
             return BetaTestMissions.create(data);
-        })
+        });
     }
 };
 
