@@ -32,6 +32,7 @@ const betaTestSchema = new Schema({
     rewards: Rewards,
     similarApps: Array,
     status: String,
+    missionsSummary: String,
 });
 
 module.exports = connection.model('beta-tests', betaTestSchema);

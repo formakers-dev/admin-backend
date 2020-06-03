@@ -17,6 +17,8 @@ const requestsRouter = require('./routes/requests');
 const adminRouter = require('./routes/admin'); //admin 관련 정보를 위한 라우터 ex) admin 사용자 정보 등
 const participantsRouter = require('./routes/participants');
 const history = require('connect-history-api-fallback');
+const epiloguesRouter = require('./routes/epilogues');
+const awardRecordsRouter = require('./routes/award-records');
 
 const app = express();
 // app.use(history());
@@ -61,6 +63,8 @@ app.use('/api/apps', appsRouter);
 app.use('/api/requests', requestsRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/participants', participantsRouter);
+app.use('/api/epilogues', epiloguesRouter);
+app.use('/api/award-records', awardRecordsRouter);
 
 
 // catch 404 and forward to error handler
