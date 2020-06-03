@@ -8,6 +8,8 @@ const insertBetaTest = (betaTest) => {
     const betaTestId = MongooseUtil.getNewObjectId();
     console.log(betaTest);
 
+    betaTest.rewards.list = convertRewards(betaTest.rewards.list);
+
     return processMissions(betaTestId, betaTest.missions, 'create')
         .then(results => {
             console.info('Missions are successfully inserted!');
@@ -19,6 +21,15 @@ const insertBetaTest = (betaTest) => {
             console.error(err);
             return Promise.reject(err);
         });
+};
+
+const convertRewards = rewardList => {
+    return rewardList.map(reward => {
+        if (reward.count < 0) {
+            delete reward.count;
+        }
+        return reward;
+    });
 };
 
 const findAllBetaTest = () => {
@@ -52,6 +63,8 @@ const processMissions = (betaTestId, missions, type) => {
 };
 
 const updateBetaTest = (betaTest) => {
+    betaTest.rewards.list = convertRewards(betaTest.rewards.list);
+
     return processMissions(betaTest._id, betaTest.missions, 'update')
         .then(results => {
             console.info('Missions are successfully updated!');
@@ -70,7 +83,7 @@ const findBetaTest = (id) => {
     const missions = BetaTestMissions.find({betaTestId:id}).lean().sort({order:1});
     promises.push(betaTest);
     promises.push(missions);
-    return Promise.all(promises).then(results =>{
+    return Promise.all(promises).then(results => {
         const data = Object.assign({}, results[0]._doc);
         data['missions'] = results[1];
         return Promise.resolve(data);
