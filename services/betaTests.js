@@ -25,7 +25,7 @@ const insertBetaTest = (betaTest) => {
 
 const convertRewards = rewardList => {
     return rewardList.map(reward => {
-        if (reward.count < 0) {
+        if (reward.count <= 0) {
             delete reward.count;
         }
         return reward;
