@@ -1,19 +1,18 @@
-const Epilogues = require('../models/epilogues');
+const mongoose = require('mongoose');
+const BetaTests = require('../models/betaTests');
 
 const getEpilogue = (betaTestId) => {
-    return Epilogues.findOne({betaTestId: betaTestId}).lean();
+    return BetaTests.findOne({"_id" : mongoose.Types.ObjectId(betaTestId)})
+        .then(betaTest => betaTest.epilogue);
 };
 
-const upsertEpilogue = (req) => {
-    if(req.body._id){
-      return Epilogues.replaceOne({_id: req.body._id}, req.body);
-    }else{
-      return new Epilogues(req.body).save();
-    }
+const upsertEpilogue = (betaTestId, epilogue) => {
+    delete epilogue.betaTestId;
+    return BetaTests.updateOne({_id : mongoose.Types.ObjectId(betaTestId)}, {$set: {epilogue : epilogue}});
 };
 
-const deleteEpilogue = (req) => {
-    return Epilogues.deleteOne({_id: req.params.id});
+const deleteEpilogue = (betaTestId) => {
+    return BetaTests.updateOne({_id : mongoose.Types.ObjectId(betaTestId)}, {$unset: {epilogue : ""}});
 };
 
 module.exports = {
@@ -21,4 +20,3 @@ module.exports = {
     upsertEpilogue,
     deleteEpilogue
 };
-
