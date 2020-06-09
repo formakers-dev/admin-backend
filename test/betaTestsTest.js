@@ -7,9 +7,9 @@ const config = require('../config');
 
 const BetaTests = require('../models/betaTests');
 
-describe('Notification', () => {
+describe('BetaTest', () => {
 
-  before(done => {
+  before(() => {
   });
 
   beforeEach(() => {
@@ -17,7 +17,7 @@ describe('Notification', () => {
 
   describe('POST /api/beta-test/', () => {
     it('ddd', done => {
-      const data = require('data/register-beta-test');
+      const data = require('./data/register-beta-test');
 
       request.post('/api/beta-test')
         .set('Authorization', config.accessToken.valid)
@@ -25,6 +25,7 @@ describe('Notification', () => {
         .send(data)
         .then(res => {
           console.log(res);
+          done();
         }).catch(err => done(err));
     })
   });
@@ -37,7 +38,7 @@ describe('Notification', () => {
 
   });
 
-  afterEach(done => {
+  afterEach(() => {
   });
 
   after(done => {

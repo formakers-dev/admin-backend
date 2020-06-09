@@ -12,6 +12,7 @@ const AwardRecordsSchema = new mongoose.Schema({
     nickName: String,
     betaTestId: mongoose.Schema.Types.ObjectId,
     type: String,
+    typeCode: Number,
     reward: Reward
 });
 

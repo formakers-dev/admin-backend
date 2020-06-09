@@ -19,6 +19,7 @@ module.exports = {
     list: [
       {
         "type": "best",
+        "typeCode": 9000,
         "title": "테스트 수석",
         "iconImageUrl": "https://i.imgur.com/ybuI732.png",
         "content": "문화상품권 3만원",
@@ -27,6 +28,7 @@ module.exports = {
         "order": 1
       }, {
         "type": "participated",
+        "typeCode": 3000,
         "title": "테스트 수석",
         "iconImageUrl": "https://i.imgur.com/ybuI732.png",
         "content": "문화상품권 3만원",

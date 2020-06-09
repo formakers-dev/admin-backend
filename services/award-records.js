@@ -65,6 +65,7 @@ const registerAwardRecords = (req, res) => {
                 userId: e.userId,
                 betaTestId: req.body.betaTestId,
                 type: req.body.type,
+                typeCode: req.body.typeCode,
                 nickName: e.nickName,
                 reward:{
                     description: req.body.reward.description,
