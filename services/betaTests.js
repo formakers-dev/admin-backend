@@ -1,7 +1,6 @@
 const MongooseUtil = require('../util/mongoose');
 const BetaTests = require('../models/betaTests');
 const BetaTestMissions = require('../models/betaTestMissions');
-const Epilogues = require('../models/epilogues');
 
 const insertBetaTest = (betaTest) => {
     console.info('Try to insert BetaTest...');

@@ -3,10 +3,17 @@ const BetaTests = require('../models/betaTests');
 const Users = require('../models/users').Users;
 
 const getAwardRecords = (req) => {
-    const filter = req.query ? req.query : {};
+    const path = req.query.path;
+    if(path === 'user'){
+        return getAwardRecordsByUserId(req);
+    }else if(path === 'beta-test'){
+        return getAwardRecordsByBetaTestId(req);
+    }
+};
+const getAwardRecordsByBetaTestId = (req) =>{
     const promises = [];
-    const betaTest = BetaTests.findOne({_id : filter.betaTestId});
-    const awardRecords = AwardRecords.find(filter).lean();
+    const betaTest = BetaTests.findOne({_id : req.query.betaTestId});
+    const awardRecords = AwardRecords.find({betaTestId:  req.query.betaTestId}).lean();
     promises.push(betaTest);
     promises.push(awardRecords);
     return Promise.all(promises).then(results =>{
@@ -16,6 +23,21 @@ const getAwardRecords = (req) => {
         return Promise.resolve(data);
     }).catch(err => Promise.reject(err));
 };
+const getAwardRecordsByUserId = (req) =>{
+    return AwardRecords.aggregate([
+        { $match:{userId:req.query.userId}},
+        { $lookup : {
+                from: 'beta-tests',
+                localField: 'betaTestId',
+                foreignField: '_id',
+                as: 'betaTest'
+            }}
+    ]).then(results=>{
+        const data = {};
+        data['awardRecords'] = results;
+        return Promise.resolve(data);
+    }).catch(err => Promise.reject(err));
+}
 
 const registerAwardRecords = (req, res) => {
     const userKey = req.body.userKey;
@@ -43,6 +65,7 @@ const registerAwardRecords = (req, res) => {
                 userId: e.userId,
                 betaTestId: req.body.betaTestId,
                 type: req.body.type,
+                typeCode: req.body.typeCode,
                 nickName: e.nickName,
                 reward:{
                     description: req.body.reward.description,
@@ -70,6 +93,7 @@ module.exports = {
     getAwardRecords,
     registerAwardRecords,
     updateAwardRecords,
-    deleteAwardRecords
+    deleteAwardRecords,
+    getAwardRecordsByUserId
 };
 

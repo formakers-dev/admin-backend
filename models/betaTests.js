@@ -3,11 +3,13 @@ const db = require('../db');
 const connection = db.FOMES;
 const Schema = mongoose.Schema;
 
-const EpilogueSchema = new Schema({
+const Epilogue = {
     awards: String,
     deeplink: String,
+    companyImageUrl: String,
     companySays: String,
-});
+    companyName: String,
+};
 
 const Rewards = {
     minimumDelay: Number,
@@ -28,7 +30,7 @@ const betaTestSchema = new Schema({
     openDate: Date,
     closeDate: Date,
     bugReport: Object,
-    epilogue: EpilogueSchema,
+    epilogue: Epilogue,
     rewards: Rewards,
     similarApps: Array,
     status: String,

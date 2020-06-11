@@ -18,7 +18,6 @@ const registerBetaTest = (req, res) => {
 const getAllBetaTests = (req, res) => {
     BetaTestService.findAllBetaTest()
         .then(result => {
-            console.log(result);
             res.json(result)
         })
         .catch(err => {
