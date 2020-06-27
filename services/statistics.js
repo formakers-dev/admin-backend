@@ -14,21 +14,19 @@ const getParticipants = (req) => {
             return Promise.resolve(data);
         }).catch(err => Promise.reject(err));
     }else{
-        const currentDate = new Date();
-        return BetaTests.aggregate([
-            { $match: {openDate :{ $lte : currentDate}}},
+        return Participations.aggregate([
+            { $match: req.query},
             { $lookup : {
-                    from: 'participations',
-                    localField: '_id',
-                    foreignField: 'betaTestId',
-                    as: 'participants'
-                }},
-            { $project : { title: 1 , openDate: 1, closeDate: 1, participants: 1 } },
-            {$sort: {closeDate: -1}},
-            { $limit : 10}
+                    from: 'users',
+                    localField: 'userId',
+                    foreignField: 'userId',
+                    as: 'user'
+            }},
+            { $project : { status: 1 , type:1, date: 1, user:{ userId:1, gender:1, birthday:1, job:1} } },
+            { $sort : { date : 1}}
         ]).then(results=>{
             const data = {
-                betaTests:results
+                participants:results
             };
             return Promise.resolve(data);
         }).catch(err => Promise.reject(err));
@@ -101,7 +99,7 @@ const getUsers = (req) => {
 };
 
 const getBetaTests = (req) =>{
-    return BetaTests.find().lean().then(results=>{
+    return BetaTests.find({},{title:1, subjectType:1, plan:1}).lean().then(results=>{
         const data = {
             betaTests: results
         };
