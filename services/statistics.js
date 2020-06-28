@@ -76,9 +76,12 @@ const getAwardRecords = (req) => {
                     foreignField: 'betaTestId',
                     as: 'awardRecords'
                 }},
-            { $project : { title: 1 , openDate: 1, closeDate: 1, awardRecords: 1 } },
+            { $project : { title: 1 , openDate: 1, closeDate: 1, awardRecords: {userId:1, reward:{price:1}} } },
             { $sort: {closeDate: sort === 'asc' ? 1 : -1}},
-            { $limit: req.query.limit ? Number(req.query.limit) : Number.MAX_SAFE_INTEGER}
+            { $limit: req.query.limit ? Number(req.query.limit) : Number.MAX_SAFE_INTEGER},
+            { $addFields : {
+                totalPrice: {$sum: '$awardRecords.reward.price'}
+            }}
         ];
         return BetaTests.aggregate(query).then(results=>{
             const data = {
