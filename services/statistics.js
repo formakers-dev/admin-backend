@@ -14,6 +14,12 @@ const getParticipants = (req) => {
             return Promise.resolve(data);
         }).catch(err => Promise.reject(err));
     }else{
+        let sort = 'asc';
+        if(req.query.sort){
+            if(req.query.sort === 'desc'){
+                sort = 'desc'
+            }
+        }
         return Participations.aggregate([
             { $match: req.query},
             { $lookup : {
@@ -22,8 +28,16 @@ const getParticipants = (req) => {
                     foreignField: 'userId',
                     as: 'user'
             }},
-            { $project : { status: 1 , type:1, date: 1, user:{ userId:1, gender:1, birthday:1, job:1} } },
-            { $sort : { date : 1}}
+            { $unwind:'$user'},
+            { $lookup : {
+                    from: 'beta-tests',
+                    localField: 'betaTestId',
+                    foreignField: '_id',
+                    as: 'betaTest'
+            }},
+            { $unwind:'$betaTest'},
+            { $project : { status: 1 , type:1, date: 1, betaTestId: 1, user:{ userId:1, gender:1, birthday:1, job:1}, betaTest:{title:1, openDate:1, closeDate:1, plan:1}}},
+            { $sort : { date : sort === 'asc' ? 1 : -1}}
         ]).then(results=>{
             const data = {
                 participants:results
