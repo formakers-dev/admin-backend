@@ -63,17 +63,24 @@ const getAwardRecords = (req) => {
         }
     }else{
         const currentDate = new Date();
-        return BetaTests.aggregate([
-            { $match: {openDate :{ $lte : currentDate}}},
+        let sort = 'asc';
+        if(req.query.sort){
+            if(req.query.sort === 'desc'){
+                sort = 'desc'
+            }
+        }
+        const query = [
             { $lookup : {
                     from: 'award-records',
                     localField: '_id',
                     foreignField: 'betaTestId',
                     as: 'awardRecords'
-            }},
+                }},
             { $project : { title: 1 , openDate: 1, closeDate: 1, awardRecords: 1 } },
-            {$sort: {closeDate: 1}}
-        ]).then(results=>{
+            { $sort: {closeDate: sort === 'asc' ? 1 : -1}},
+            { $limit: req.query.limit ? Number(req.query.limit) : Number.MAX_SAFE_INTEGER}
+        ];
+        return BetaTests.aggregate(query).then(results=>{
             const data = {
                 betaTests:results
             };
