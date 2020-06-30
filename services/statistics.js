@@ -4,6 +4,12 @@ const Users = require('../models/users').Users;
 const BetaTests = require('../models/betaTests');
 
 const getParticipants = (req) => {
+    let sort = 'asc';
+    if(req.query.sort){
+        if(req.query.sort === 'desc'){
+            sort = 'desc'
+        }
+    }
     if(req.query.path === 'overview'){
         const filter = req.query
         delete filter.path;
@@ -13,7 +19,32 @@ const getParticipants = (req) => {
             };
             return Promise.resolve(data);
         }).catch(err => Promise.reject(err));
-    }else{
+    } else if(req.query.groupBy === 'beta-test'){
+        return Participations.aggregate([
+            { $match: {type:'beta-test'}},
+            { $lookup : {
+                    from: 'beta-tests',
+                    localField: 'betaTestId',
+                    foreignField: '_id',
+                    as: 'betaTest'
+            }},
+            { $unwind:'$betaTest'},
+            { $project : { status: 1 , betaTestId: 1, type:1, date: 1, betaTest:{title:1, openDate:1, closeDate:1}}},
+            { $group: {
+                    _id : {betaTestId : '$betaTestId', title: '$betaTest.title', openDate: '$betaTest.openDate', closeDate: '$betaTest.closeDate'},
+                    totalAttendCount: {$sum:{$cond : {if: {$eq: [ "$status", 'attend' ]}, then: 1, else:0}}},
+                    totalCompleteCount: {$sum: {$cond : {if: {$eq: [ "$status", 'complete' ]}, then: 1, else:0}}},
+                }
+            },
+            { $sort : { '_id.closeDate' : sort === 'asc' ? 1 : -1}},
+            { $limit: req.query.limit ? Number(req.query.limit) : Number.MAX_SAFE_INTEGER},
+        ]).then(results=>{
+            const data = {
+                participants:results
+            };
+            return Promise.resolve(data);
+        }).catch(err => Promise.reject(err));
+    } else {
         let sort = 'asc';
         if(req.query.sort){
             if(req.query.sort === 'desc'){
