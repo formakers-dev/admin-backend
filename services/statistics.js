@@ -20,8 +20,12 @@ const getParticipants = (req) => {
             return Promise.resolve(data);
         }).catch(err => Promise.reject(err));
     } else if(req.query.groupBy === 'beta-test'){
+        const firstMatch = { type: 'beta-test'};
+        if(req.query.status){
+            firstMatch.status = req.query.status;
+        }
         return Participations.aggregate([
-            { $match: {type:'beta-test'}},
+            { $match: firstMatch},
             { $lookup : {
                     from: 'beta-tests',
                     localField: 'betaTestId',
@@ -99,7 +103,6 @@ const getAwardRecords = (req) => {
             return Promise.reject({message:'invalid filters'});
         }
     }else{
-        const currentDate = new Date();
         let sort = 'asc';
         if(req.query.sort){
             if(req.query.sort === 'desc'){
@@ -113,7 +116,7 @@ const getAwardRecords = (req) => {
                     foreignField: 'betaTestId',
                     as: 'awardRecords'
                 }},
-            { $project : { title: 1 , openDate: 1, closeDate: 1, awardRecords: {userId:1, reward:{price:1}} } },
+            { $project : { _id:1, title: 1 , openDate: 1, closeDate: 1, awardRecords: {userId:1, reward:{price:1}} } },
             { $sort: {closeDate: sort === 'asc' ? 1 : -1}},
             { $limit: req.query.limit ? Number(req.query.limit) : Number.MAX_SAFE_INTEGER},
             { $addFields : {
