@@ -82,24 +82,16 @@ const getAwardRecords = (req) => {
     if(req.query.filters){
         const filters = req.query.filters.split(',');
         if(filters.indexOf('totalPrice') >-1){
-            return AwardRecords.aggregate([
-                {
-                    "$match": {
-                        "reward.price":{
-                            "$exists":true,
-                            "$ne":null
-                        }
-                    }
-                },
-                {
-                    "$group": {
-                        '_id' : 'null',
-                        "totalPrice":{"$sum": "$reward.price"}
-                    }
-                }
-            ]).then(results=>{
+            const query =[
+                {  $match: {"reward.price":{ "$exists":true, "$ne":null}}},
+                {  $group: {'_id' : 'null',"totalPrice":{$sum: "$reward.price"}}}
+                ];
+            if(req.query.betaTestId){
+                query[0]['$match']['betaTestId'] = req.query.betaTestId;
+            }
+            return AwardRecords.aggregate(query).then(results=>{
                 const data = {
-                    totalAwardRecordPrice: results[0].totalPrice
+                    totalAwardRecordPrice: results.length > 0 ? results[0].totalPrice : 0
                 };
                 return Promise.resolve(data);
             }).catch(err => Promise.reject(err));
