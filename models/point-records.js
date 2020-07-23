@@ -10,12 +10,12 @@ const Constants = {
     EXCHANGE: 2,
   },
   STATUS: {
-    COMPLETED: 1, // 완료
+    COMPLETED: 99, // 완료
     REQUESTED: 10, // 요청 (운영팀에 요청하는 경우)
     // 예정?
   },
   OPERATION_STATUS: { //운영측 상태
-    COMPLETED: 1,
+    COMPLETED: 99,
     OPENED: 10,
     FAILED: -1
   }
