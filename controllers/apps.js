@@ -15,4 +15,16 @@ const getApp = (req, res) => {
         });
 };
 
-module.exports = { getApp };
+const requestCrawling = (req, res) => {
+    AppsService.requestCrawling(req.params.packageName)
+        .then(() => res.sendStatus(200))
+        .catch(err => {
+            console.error(err);
+            res.send(err);
+        });
+};
+
+module.exports = {
+    getApp,
+    requestCrawling
+};

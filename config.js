@@ -23,6 +23,11 @@ config.development = {
     },
     web: {
         cors: true
+    },
+    crawler: {
+        instanceId: process.env.CRAWLER_INSTANCE_ID,
+        command: process.env.CRAWLER_COMMAND,
+        workingDir: process.env.CRAWLER_WORKING_DIR
     }
 };
 
@@ -59,7 +64,12 @@ config.test = {
     accessToken: {
         valid: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOGQ3ZDI4ZTEwNWViMjgzOTkwZDI5NyIsImlhdCI6MTU4NjMzMTg5MSwiZXhwIjoxNzQ0MTE5ODkxfQ.mMnIbFMiIBsL3RT--k2A0xzS1InMqqhXAtvPEcDcbco'
     },
-    web: {}
+    web: {},
+    crawler: {
+        instanceId: 'testInstanceId',
+        command: 'testCommand',
+        workingDir: 'testWorkingDir'
+    }
 };
 
 module.exports = config[process.env.NODE_ENV];
