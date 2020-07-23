@@ -11,8 +11,13 @@ const Constants = {
   },
   STATUS: {
     COMPLETED: 1, // 완료
-    REQUEST: 10, // 요청 (운영팀에 요청하는 경우)
+    REQUESTED: 10, // 요청 (운영팀에 요청하는 경우)
     // 예정?
+  },
+  OPERATION_STATUS: { //운영측 상태
+    COMPLETED: 1,
+    OPENED: 10,
+    FAILED: -1
   }
 };
 
@@ -28,7 +33,9 @@ const schema = new Schema({
     refId: ObjectId,
   },
   operationData: {
-    operatorAccountId: String,
+    status: Number,
+    operatorAccount: String,
+    memo: String
   },
 
   // for exchange type

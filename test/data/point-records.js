@@ -67,7 +67,7 @@ const data = [
         "date" : ISODate("2020-07-01T00:00:00.001Z"),
         "point" : -10000,
         "type" : PointConstants.TYPE.EXCHANGE,
-        "status" : PointConstants.STATUS.REQUEST,
+        "status" : PointConstants.STATUS.REQUESTED,
         "description" : "문화상품권 2장 교환 신청",
         "metaData" : {
             "type" : "giftCertificate5000",
@@ -81,7 +81,7 @@ const data = [
         "date" : ISODate("2020-07-11T00:00:00.001Z"),
         "point" : -20000,
         "type" : PointConstants.TYPE.EXCHANGE,
-        "status" : PointConstants.STATUS.REQUEST,
+        "status" : PointConstants.STATUS.REQUESTED,
         "description" : "문화상품권 4장 교환 신청",
         "metaData" : {
             "type" : "giftCertificate5000",

@@ -28,6 +28,60 @@ describe('PointRecords', () => {
         });
     });
 
+    describe('PUT /api/points/:id/exchange', () => {
+        it('교환 요청에 대한 운영 측 완료처리를 수행한다', done => {
+            const requestedExchangePointRecordId = '5efaee3be03734ef5dadb881';
+
+            request.put('/api/points/' + requestedExchangePointRecordId + '/exchange')
+                .set('Authorization', config.accessToken.valid)
+                .expect(200)
+                .send({
+                    operationStatus : PointConstants.OPERATION_STATUS.COMPLETED,
+                    operatorAccount : 'jason.ryu@formakers.net',
+                    memo : '아무메모나...',
+                })
+                .then(() => PointRecords.findById(requestedExchangePointRecordId))
+                .then(pointRecord => {
+                    console.log(pointRecord);
+
+                    pointRecord.type.should.be.eql(PointConstants.TYPE.EXCHANGE);
+                    pointRecord.point.should.be.eql(-10000);
+                    pointRecord.status.should.be.eql(PointConstants.STATUS.COMPLETED);
+                    pointRecord.operationData.status.should.be.eql(PointConstants.OPERATION_STATUS.COMPLETED);
+                    pointRecord.operationData.operatorAccount.should.be.eql('jason.ryu@formakers.net');
+                    pointRecord.operationData.memo.should.be.eql('아무메모나...');
+
+                    done();
+                }).catch(err => done(err));
+        });
+
+        it('교환 요청에 대한 운영 측 실패처리를 수행한다', done => {
+            const completedExchangePointRecordId = '5efaee3be03734ef5dadb888';
+
+            request.put('/api/points/' + completedExchangePointRecordId + '/exchange')
+                .set('Authorization', config.accessToken.valid)
+                .expect(200)
+                .send({
+                    operationStatus : PointConstants.OPERATION_STATUS.FAILED,
+                    operatorAccount : 'jason.ryu@formakers.net',
+                    memo : '아무메모나...',
+                })
+                .then(() => PointRecords.findById(completedExchangePointRecordId))
+                .then(pointRecord => {
+                    console.log(pointRecord);
+
+                    pointRecord.type.should.be.eql(PointConstants.TYPE.EXCHANGE);
+                    pointRecord.point.should.be.eql(-5000);
+                    pointRecord.status.should.be.eql(PointConstants.STATUS.REQUESTED);
+                    pointRecord.operationData.status.should.be.eql(PointConstants.OPERATION_STATUS.FAILED);
+                    pointRecord.operationData.operatorAccount.should.be.eql('jason.ryu@formakers.net');
+                    pointRecord.operationData.memo.should.be.eql('아무메모나...');
+
+                    done();
+                }).catch(err => done(err));
+        });
+    });
+
     after(done => {
         PointRecords.remove({}, done);
     });
