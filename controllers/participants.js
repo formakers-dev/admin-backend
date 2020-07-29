@@ -25,8 +25,25 @@ const deleteParticipant = (req, res) => {
         });
 };
 
+const deleteParticipantForBetaTest = (req, res) => {
+    const betaTestId = req.params.betaTestId;
+    const userId = req.params.userId;
+
+    if (!!!betaTestId || !!!userId) {
+        return res.status(412).json({error:'요청 정보가 사전 조건을 충족하지 않습니다.'});
+    }
+
+    service.deleteParticipantForBetaTest(betaTestId, userId)
+        .then(result => res.sendStatus(200))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: err.message});
+        });
+};
+
 module.exports = {
     getParticipants,
     registerParticipants,
-    deleteParticipant
+    deleteParticipant,
+    deleteParticipantForBetaTest,
 };

@@ -50,11 +50,16 @@ const registerParticipants = (body) => {
 
 const deleteParticipant = (id)=>{
     return Participations.deleteOne({_id:id});
-}
+};
+
+const deleteParticipantForBetaTest = (betaTestId, userId) => {
+    return Participations.deleteMany({betaTestId: betaTestId, userId: userId});
+};
 
 module.exports = {
     getParticipants,
     registerParticipants,
-    deleteParticipant
+    deleteParticipant,
+    deleteParticipantForBetaTest,
 };
 

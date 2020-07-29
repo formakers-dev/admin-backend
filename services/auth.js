@@ -82,6 +82,7 @@ const login = (req, res) => {
 const signUp = (req, res) => {
     // password encryption
     const account = req.body.email;
+    const nickName = req.body.nickName;
     const pw = req.body.password;
     const encryptedPw = bcrypt.hashSync(pw, Constants.SALT_ROUNDS);
     Account.findOne({account: account}, (err, result) => {
@@ -97,6 +98,7 @@ const signUp = (req, res) => {
         } else {
             new Account({
                 account: account,
+                nickName: nickName,
                 password: encryptedPw,
                 status: Constants.STATUS.PENDING,
                 createAt: new Date(),
