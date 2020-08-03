@@ -24,10 +24,14 @@ describe('AwardRecords', () => {
                     type: 'userId',
                     data: ['userId1', 'userId2']
                 },
-                betaTestId: new ObjectId('123456789012345678901234'),
+                betaTest: {
+                  id: new ObjectId('123456789012345678901234'),
+                  title: '게임 테스트'
+                },
                 award: {
-                    type: 'best',
-                    typeCode: 9000,
+                  type: 'best',
+                  typeCode: 9000,
+                  typeName: "테스트 수석"
                 },
                 reward: {
                     description : "오처넌 포인트다",
@@ -45,7 +49,7 @@ describe('AwardRecords', () => {
                     type: PointConstants.TYPE.SAVE,
                     status: PointConstants.STATUS.COMPLETED,
                     "metaData.refType" : "beta-test",
-                    "metaData.refId": requestBody.betaTestId
+                    "metaData.refId": requestBody.betaTest.id
                 }))
                 .then(res => {
                     console.log(res)
@@ -54,9 +58,11 @@ describe('AwardRecords', () => {
 
                     pointRecords[0].userId.should.be.eql('userId1');
                     pointRecords[0].point.should.be.eql(5000);
+                    pointRecords[0].description.should.be.eql('게임 테스트 - 테스트 수석');
 
                     pointRecords[1].userId.should.be.eql('userId2');
                     pointRecords[1].point.should.be.eql(5000);
+                    pointRecords[1].description.should.be.eql('게임 테스트 - 테스트 수석');
                   done();
                 }).catch(err => done(err));
         });
@@ -67,10 +73,14 @@ describe('AwardRecords', () => {
             type: 'userId',
             data: ['userId0', 'userId-1']
           },
-          betaTestId: new ObjectId('123456789012345678901234'),
+          betaTest: {
+            id: new ObjectId('123456789012345678901234'),
+            title: '게임 테스트'
+          },
           award: {
             type: 'best',
             typeCode: 9000,
+            typeName: "테스트 수석"
           },
           reward: {
             description : "오처넌 포인트다",
@@ -88,7 +98,7 @@ describe('AwardRecords', () => {
             type: PointConstants.TYPE.SAVE,
             status: PointConstants.STATUS.COMPLETED,
             "metaData.refType" : "beta-test",
-            "metaData.refId": requestBody.betaTestId
+            "metaData.refId": requestBody.betaTest.id
           }))
           .then(res => {
             console.log(res)
@@ -103,10 +113,14 @@ describe('AwardRecords', () => {
             type: 'userId',
             data: ['userId1', 'userId2']
           },
-          betaTestId: new ObjectId('123456789012345678901234'),
+          betaTest: {
+            id: new ObjectId('123456789012345678901234'),
+            title: '게임 테스트'
+          },
           award: {
             type: 'best',
             typeCode: 9000,
+            typeName: "테스트 수석"
           },
           reward: {
             description : "오처넌 포인트다",
@@ -124,7 +138,7 @@ describe('AwardRecords', () => {
             type: PointConstants.TYPE.SAVE,
             status: PointConstants.STATUS.COMPLETED,
             "metaData.refType" : "beta-test",
-            "metaData.refId": requestBody.betaTestId
+            "metaData.refId": requestBody.betaTest.id
           }))
           .then(res => {
             res.length.should.be.eql(0);

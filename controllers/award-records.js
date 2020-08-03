@@ -9,7 +9,7 @@ const getAwardRecords = (req, res) => {
 };
 
 const registerAwardRecords = (req, res) => {
-    const betaTestId = req.body.betaTestId;
+    const betaTest = req.body.betaTest;
     const award = req.body.award;
     const reward = req.body.reward;
     const userIdentifierType = req.body.userIdentifier.type;
@@ -20,13 +20,14 @@ const registerAwardRecords = (req, res) => {
 
     let users;
 
-    AwardRecordsService.registerAwardRecords(req.body.userIdentifier, betaTestId, award, reward)
+    AwardRecordsService.registerAwardRecords(req.body.userIdentifier, betaTest.id, award, reward)
       .then(users => {
           this.users = users;
 
           if (reward.paymentType === "point") {
             const userIds = users.map(user => user.userId);
-            return PointsService.insertManyPointsForSave(userIds, reward.price, reward.description, 'beta-test', betaTestId);
+            const pointDescription = betaTest.title + " - " + award.typeName;
+            return PointsService.insertManyPointsForSave(userIds, reward.price, pointDescription, 'beta-test', betaTest.id);
           } else {
             return Promise.resolve();
           }
