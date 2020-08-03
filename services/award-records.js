@@ -1,6 +1,7 @@
 const AwardRecords = require('../models/award-records');
 const BetaTests = require('../models/betaTests');
 const Users = require('../models/users').Users;
+const NotExistUser = require('../services/users').NotExistUser;
 
 const getAwardRecords = (req) => {
     const path = req.query.path;
@@ -39,51 +40,41 @@ const getAwardRecordsByUserId = (req) =>{
         data['awardRecords'] = results;
         return Promise.resolve(data);
     }).catch(err => Promise.reject(err));
-}
+};
 
-const registerAwardRecords = (req, res) => {
-    const userIdentifierType = req.body.userIdentifierType;
-    const userIdentifiers = req.body.userIdentifiers;
-    if (userIdentifierType !=='email' && userIdentifierType !=='userId' && userIdentifierType !=='nickName') {
-        return res.status(400).json({error:'잘못된 타입입니다.'});
-    }
-
+const registerAwardRecords = (userIdentifier, betaTestId, award, reward) => {
     const filter = {};
-    filter[userIdentifierType] = {$in: userIdentifiers};
+    filter[userIdentifier.type] = {$in: userIdentifier.data};
 
     let users;
 
-    Users.find(filter, {userId: 1, nickName: 1, email: 1})
+    return Users.find(filter, {userId: 1, nickName: 1, email: 1})
       .lean()
       .then(result => {
           users = result;
           console.log(users);
 
-          if (!users) {
-              return res.sendStatus(204);
+          if (!users || users.length <= 0) {
+              return Promise.reject(new NotExistUser());
           }
 
           const awardRecords = users.map(e => {
               return {
                   userId: e.userId,
-                  betaTestId: req.body.betaTestId,
-                  type: req.body.type,
-                  typeCode: req.body.typeCode,
+                  betaTestId: betaTestId,
+                  type: award.type,
+                  typeCode: award.typeCode,
                   nickName: e.nickName,
                   reward: {
-                      description: req.body.reward.description,
-                      price: req.body.reward.price,
-                      paymentType: req.body.reward.paymentType
+                      description: reward.description,
+                      price: reward.price,
+                      paymentType: reward.paymentType
                   }
               };
           });
 
           return AwardRecords.insertMany(awardRecords)
-      })
-      .then(() => res.status(200).json(users))
-      .catch(e => {
-          throw e;
-      });
+      }).then(() => Promise.resolve(users));
 };
 
 const updateAwardRecords = (req) => {

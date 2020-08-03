@@ -28,7 +28,27 @@ const convertPointExchangeStatus = (operationStatus) => {
     }
 };
 
+const insertManyPointsForSave = (userIds, point, description, refType, refId) =>{
+    const pointRecords = userIds.map(userId => {
+        return {
+            userId: userId,
+            date: new Date(),
+            point: point,
+            type: PointConstant.TYPE.SAVE,
+            status: PointConstant.STATUS.COMPLETED,
+            description: description,
+            metaData: {
+                refType: refType,
+                refId: refId
+            }
+        }
+    })
+
+    return PointRecords.insertMany(pointRecords);
+};
+
 module.exports = {
     findPoints,
-    updateOperationDataForExchange
+    updateOperationDataForExchange,
+    insertManyPointsForSave
 };
