@@ -3,6 +3,7 @@ const PointConstants = require('../../models/point-records').Constants;
 
 const ObjectId = mongoose.Types.ObjectId;
 const ISODate = (ISODateString) => new Date(ISODateString);
+const config = require('../../config');
 
 const data = [
     {
@@ -91,7 +92,33 @@ const data = [
             "operatorAccountId" : "jason@formakers.net"
         },
         "phoneNumber" : '010-1111-5555'
-    }
+    },
+    {
+        "_id" : ObjectId("5efaedeae03734ef5dad8fff"),
+        "userId" : config.fomesUser.userId,
+        "date" : ISODate("2020-06-30T00:00:00.000Z"),
+        "point" : 1000,
+        "type" : PointConstants.TYPE.SAVE,
+        "status" : PointConstants.STATUS.COMPLETED,
+        "description" : "더팜 게임테스트 성실상",
+        "metaData" : {
+            "refType" : "beta-test",
+            "refId" : ObjectId("5dd38c8cb1e19307f5fce299")
+        }
+    },
+    {
+        "_id" : ObjectId("5efaedeae03734ef5dad8ff0"),
+        "userId" : config.fomesUser.userId,
+        "date" : ISODate("2020-06-30T00:00:00.000Z"),
+        "point" : 1000,
+        "type" : PointConstants.TYPE.SAVE,
+        "status" : PointConstants.STATUS.COMPLETED,
+        "description" : "더팜 게임테스트 성실상2",
+        "metaData" : {
+            "refType" : "beta-test",
+            "refId" : ObjectId("5dd38c8cb1e19307f5fce290")
+        }
+    },
 ];
 
 module.exports = data;

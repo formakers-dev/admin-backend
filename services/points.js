@@ -47,8 +47,19 @@ const insertManyPointsForSave = (userIds, point, description, refType, refId) =>
     return PointRecords.insertMany(pointRecords);
 };
 
+const deleteSavePoints = (bestTestId, userIds) => {
+    return PointRecords.remove({
+        userId : { $in : userIds },
+        type: PointConstant.TYPE.SAVE,
+        'metaData.refType': 'beta-test',
+        'metaData.refId': bestTestId
+    });
+};
+
+
 module.exports = {
     findPoints,
     updateOperationDataForExchange,
-    insertManyPointsForSave
+    insertManyPointsForSave,
+    deleteSavePoints
 };

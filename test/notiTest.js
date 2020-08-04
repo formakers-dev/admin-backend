@@ -13,7 +13,9 @@ const agenda = require('../agenda');
 describe('Notification', () => {
     const sandbox = sinon.createSandbox();
 
-    before(done => {
+    beforeEach(done => {
+        moxios.install();
+
         Users.create([
             {
                 userId: "userId1",
@@ -53,12 +55,6 @@ describe('Notification', () => {
             }
         ], done);
     });
-
-    beforeEach(() => {
-        moxios.install();
-    });
-
-
 
     describe('GET /noti/reserved', () => {
 
@@ -185,8 +181,10 @@ describe('Notification', () => {
                             body.data.deeplink.should.be.eql('딥링크');
 
                             body.registration_ids.length.should.be.eql(2);
-                            body.registration_ids[0].should.be.eql('registrationToken1');
-                            body.registration_ids[1].should.be.eql('registrationToken3');
+                            const actualRegistrationIds = body.registration_ids.sort((a, b) => a - b);
+                            console.log(actualRegistrationIds)
+                            actualRegistrationIds[0].should.be.eql('registrationToken1');
+                            actualRegistrationIds[1].should.be.eql('registrationToken3');
 
                             done();
                         });
@@ -548,12 +546,9 @@ describe('Notification', () => {
         agenda.jobs({})
             .then(jobs => {
                 jobs.forEach(job => job.remove());
-                done();
+                return Users.remove({});
             })
+            .then(() => done())
             .catch(err => done(err));
-    });
-
-    after(done => {
-        Users.remove({}, done);
     });
 });

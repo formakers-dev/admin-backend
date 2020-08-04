@@ -8,23 +8,23 @@ const config = require('../config');
 
 describe('PointRecords', () => {
 
-    before(done => {
+    beforeEach(done => {
         PointRecords.create(require('./data/point-records'), done);
     });
 
     describe('GET /api/points?type=exchange', () => {
         it('교환 타입 목록만을 반환한다', done => {
             request.get('/api/points?type=exchange')
-              .set('Authorization', config.accessToken.valid)
-              .expect(200)
-              .then(res => {
-                  console.log(res.body);
+                .set('Authorization', config.accessToken.valid)
+                .expect(200)
+                .then(res => {
+                    console.log(res.body);
 
-                  res.body.filter(item => item.type === PointConstants.TYPE.EXCHANGE)
-                    .length.should.be.eql(res.body.length);
+                    res.body.filter(item => item.type === PointConstants.TYPE.EXCHANGE)
+                        .length.should.be.eql(res.body.length);
 
-                  done();
-              }).catch(err => done(err));
+                    done();
+                }).catch(err => done(err));
         });
     });
 
@@ -36,9 +36,9 @@ describe('PointRecords', () => {
                 .set('Authorization', config.accessToken.valid)
                 .expect(200)
                 .send({
-                    operationStatus : PointConstants.OPERATION_STATUS.COMPLETED,
-                    operatorAccount : 'jason.ryu@formakers.net',
-                    memo : '아무메모나...',
+                    operationStatus: PointConstants.OPERATION_STATUS.COMPLETED,
+                    operatorAccount: 'jason.ryu@formakers.net',
+                    memo: '아무메모나...',
                 })
                 .then(() => PointRecords.findById(requestedExchangePointRecordId))
                 .then(pointRecord => {
@@ -62,9 +62,9 @@ describe('PointRecords', () => {
                 .set('Authorization', config.accessToken.valid)
                 .expect(200)
                 .send({
-                    operationStatus : PointConstants.OPERATION_STATUS.FAILED,
-                    operatorAccount : 'jason.ryu@formakers.net',
-                    memo : '아무메모나...',
+                    operationStatus: PointConstants.OPERATION_STATUS.FAILED,
+                    operatorAccount: 'jason.ryu@formakers.net',
+                    memo: '아무메모나...',
                 })
                 .then(() => PointRecords.findById(completedExchangePointRecordId))
                 .then(pointRecord => {
@@ -82,7 +82,40 @@ describe('PointRecords', () => {
         });
     });
 
-    after(done => {
+
+    describe('DELETE /api/points/beta-test/:betaTestId/save', () => {
+        it('특정 베타테스트 및 특정 유저의 적립 포인트 삭제 요청 시, 해당 포인트 이력을 삭제한다', done => {
+            const betaTestId = '5dd38c8cb1e19307f5fce299';
+            const userIds = [config.fomesUser.userId, 'googleUserId'];
+
+            request.delete('/api/points/beta-test/' + betaTestId + '/save')
+                .set('Authorization', config.accessToken.valid)
+                .expect(200)
+                .send({userIds: userIds})
+                .then(() => PointRecords.find({
+                    userId: {$in: userIds},
+                    'metaData.refType': 'beta-test',
+                    'metaData.refId': betaTestId
+                }))
+                .then(pointRecords => {
+                    console.log(pointRecords);
+                    pointRecords.length.should.be.eql(0);
+
+                    // 그 외 이력들이 삭제되지 않았는지 확인
+                    return PointRecords.find({
+                        userId: {$in: userIds},
+                        'metaData.refType': 'beta-test',
+                    });
+                })
+                .then(pointRecords => {
+                    console.log(pointRecords);
+                    pointRecords.length.should.be.eql(2);
+                    done();
+                }).catch(err => done(err));
+        });
+    });
+
+    afterEach(done => {
         PointRecords.remove({}, done);
     });
 });

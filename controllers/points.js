@@ -35,7 +35,20 @@ const updateOperationDataForExchange = (req, res) => {
         });
 };
 
+const deleteSavePoints = (req, res) => {
+    const bestTestId = req.params.betaTestId;
+    const userIds = req.body.userIds;
+
+    service.deleteSavePoints(bestTestId, userIds)
+        .then(() => res.sendStatus(200))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: err.message});
+        });
+};
+
 module.exports = {
     getPoints,
-    updateOperationDataForExchange
+    updateOperationDataForExchange,
+    deleteSavePoints
 };

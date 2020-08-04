@@ -7,7 +7,7 @@ const config = require('../config');
 
 describe('Users', () => {
 
-    before(done => {
+    beforeEach(done => {
         Users.create([
             {
                 userId: "userId1",
@@ -52,7 +52,7 @@ describe('Users', () => {
         });
     });
 
-    after(done => {
+    afterEach(done => {
         Users.remove({}, done);
     });
 });
