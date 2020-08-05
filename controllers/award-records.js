@@ -18,11 +18,11 @@ const registerAwardRecords = (req, res) => {
         return res.status(400).json({error:'잘못된 타입입니다.'});
     }
 
-    let users;
+    let responseData;
 
     AwardRecordsService.registerAwardRecords(req.body.userIdentifier, betaTest.id, award, reward)
       .then(users => {
-          this.users = users;
+          responseData = users;
 
           if (reward.paymentType === "point") {
             const userIds = users.map(user => user.userId);
@@ -32,7 +32,7 @@ const registerAwardRecords = (req, res) => {
             return Promise.resolve();
           }
       })
-      .then(() => res.status(200).json(users))
+      .then(() => res.status(200).json(responseData))
       .catch(err => {
         console.error(err);
         if (err instanceof NotExistUser) {
