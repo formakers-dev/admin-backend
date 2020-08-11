@@ -433,7 +433,7 @@ describe('Notification', () => {
             body.data.channel.should.be.eql(expectedDataMap.channel);
             body.data.title.should.be.eql(expectedDataMap.title);
             body.data.subTitle.should.be.eql(expectedDataMap.subTitle);
-            // body.data.deeplink.should.be.eql('더보기로 가는게 제일 좋긴한데.....');
+            body.data.deeplink.should.be.eql('fomes://point/history');
 
             body.registration_ids.length.should.be.eql(expectedDataMap.registrationIds.length);
             const actualRegistrationIds = body.registration_ids.sort((a, b) => a - b);

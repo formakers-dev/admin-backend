@@ -79,6 +79,7 @@ const sendPointNoti = (req, res) => {
             channel: 'channel_point',
             title: '💰 ' + pointNotiMap[key].point.toLocaleString() + '포인트 적립 💰',
             subTitle: '👏 ' + pointNotiMap[key].betaTest.title + ' - ' + pointNotiMap[key].award.title + '으로 선정되었습니다!',
+            deeplink: 'fomes://point/history'
         })
         .then(users => {
             console.log(users ? users.length : 0 + '건의 포인트 지급 알림이 전송되었음');
