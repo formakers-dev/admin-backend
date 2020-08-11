@@ -16,44 +16,46 @@ describe('Notification', () => {
     beforeEach(done => {
         moxios.install();
 
-        Users.create([
-            {
-                userId: "userId1",
-                email: "email1",
-                registrationToken: 'registrationToken1',
-                activatedDate: new Date('2019-08-21'),
-            },
-            {
-                userId: "userId2",
-                email: "email2",
-                registrationToken: 'registrationToken2',
-                activatedDate: new Date('2019-08-14'),
-            },
-            {
-                userId: "userId3",
-                email: "email3",
-                registrationToken: 'registrationToken3',
-                activatedDate: new Date('2019-08-07'),
-            },
-            {
-                userId: "userId4",
-                email: "email4",
-                registrationToken: 'registrationToken4',
-                activatedDate: new Date('2019-07-31'),
-            },
-            {
-                userId: "userId5",
-                email: "email5",
-                registrationToken: 'registrationToken5',
-                activatedDate: new Date('2019-07-22'),
-            },
-            {
-                userId: "userId6",
-                email: "email6",
-                registrationToken: 'registrationToken6',
-                activatedDate: new Date('2019-07-21'),
-            }
-        ], done);
+        Users.remove({})
+            .then(() =>
+            Users.create([
+                {
+                    userId: "userId1",
+                    email: "email1",
+                    registrationToken: 'registrationToken1',
+                    activatedDate: new Date('2019-08-21'),
+                },
+                {
+                    userId: "userId2",
+                    email: "email2",
+                    registrationToken: 'registrationToken2',
+                    activatedDate: new Date('2019-08-14'),
+                },
+                {
+                    userId: "userId3",
+                    email: "email3",
+                    registrationToken: 'registrationToken3',
+                    activatedDate: new Date('2019-08-07'),
+                },
+                {
+                    userId: "userId4",
+                    email: "email4",
+                    registrationToken: 'registrationToken4',
+                    activatedDate: new Date('2019-07-31'),
+                },
+                {
+                    userId: "userId5",
+                    email: "email5",
+                    registrationToken: 'registrationToken5',
+                    activatedDate: new Date('2019-07-22'),
+                },
+                {
+                    userId: "userId6",
+                    email: "email6",
+                    registrationToken: 'registrationToken6',
+                    activatedDate: new Date('2019-07-21'),
+                }
+            ], done));
     });
 
     describe('GET /noti/reserved', () => {
@@ -181,7 +183,7 @@ describe('Notification', () => {
                             body.data.deeplink.should.be.eql('딥링크');
 
                             body.registration_ids.length.should.be.eql(2);
-                            const actualRegistrationIds = body.registration_ids.sort((a, b) => a - b);
+                            const actualRegistrationIds = body.registration_ids.sort((a, b) => a > b ? 1 : -1);
                             console.log(actualRegistrationIds)
                             actualRegistrationIds[0].should.be.eql('registrationToken1');
                             actualRegistrationIds[1].should.be.eql('registrationToken3');
@@ -371,6 +373,107 @@ describe('Notification', () => {
                         done();
                     }).catch(err => done(err));
             });
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        })
+
+    });
+
+    describe('POST /noti/point', () => {
+        const requestBody = [
+            {
+                userId: "userId1",
+                point: 30000,
+                award: {
+                    typeCode: 9000,
+                    title: '테스트 수석'
+                },
+                betaTest: {
+                    _id: '5eb3b605bb2696f03826e0a6',
+                    title: '[아무게임챌린지] 게임 테스트',
+                }
+            },
+            {
+                userId: "userId2",
+                point: 30000,
+                award: {
+                    typeCode: 9000,
+                    title: '테스트 수석'
+                },
+                betaTest: {
+                    _id: '5eb3b605bb2696f03826e0a6',
+                    title: '[아무게임챌린지] 게임 테스트',
+                }
+            },
+            {
+                userId: "userId3",
+                point: 1000,
+                award: {
+                    typeCode: 1000,
+                    title: '성실'
+                },
+                betaTest: {
+                    _id: '5eb3b605bb2696f03826e0a6',
+                    title: '[아무게임챌린지] 게임 테스트',
+                }
+            }
+        ];
+
+        function assertPointNoti(request, expectedDataMap) {
+            const url = request.url;
+            url.should.be.eql('https://fcm.googleapis.com/fcm/send');
+
+            const header = request.headers;
+            header.Authorization.should.be.eql('key=' + config.firebase_messaging.serverKey);
+            header['Content-Type'].should.be.eql('application/json');
+
+            const body = JSON.parse(request.config.data);
+            body.data.channel.should.be.eql(expectedDataMap.channel);
+            body.data.title.should.be.eql(expectedDataMap.title);
+            body.data.subTitle.should.be.eql(expectedDataMap.subTitle);
+            // body.data.deeplink.should.be.eql('더보기로 가는게 제일 좋긴한데.....');
+
+            body.registration_ids.length.should.be.eql(expectedDataMap.registrationIds.length);
+            const actualRegistrationIds = body.registration_ids.sort((a, b) => a - b);
+            actualRegistrationIds.forEach((actual, index) => actual.should.be.eql(expectedDataMap.registrationIds[index]));
+        }
+
+        it('보상 타입별로 보상 노티가 전달된다', done => {
+            moxios.stubRequest('https://fcm.googleapis.com/fcm/send', {
+                status: 200
+            });
+
+            request.post('/api/noti/point')
+                .set('Authorization', config.accessToken.valid)
+                .expect(200)
+                .send(requestBody)
+                .then(() => {
+                    moxios.wait(() => {
+                        const requests = [];
+                        for (let i = 0; i < moxios.requests.count(); i++) {
+                            requests.push(moxios.requests.at(i));
+                        }
+                        const sortedRequests = requests.sort((a, b) => JSON.parse(a.config.data).data.title > JSON.parse(b.config.data).data.title ? -1 : 1);
+
+                        assertPointNoti(sortedRequests[0], {
+                            channel: "channel_point",
+                            title: "💰 30,000포인트 적립 💰",
+                            subTitle: '👏 [아무게임챌린지] 게임 테스트 - 테스트 수석으로 선정되었습니다!',
+                            registrationIds:['registrationToken1', 'registrationToken2']
+                        });
+
+                        assertPointNoti(sortedRequests[1], {
+                            channel: "channel_point",
+                            title: "💰 1,000포인트 적립 💰",
+                            subTitle: '👏 [아무게임챌린지] 게임 테스트 - 성실으로 선정되었습니다!',
+                            registrationIds:['registrationToken3']
+                        });
+
+                        done();
+                    });
+                }).catch(err => done(err));
         });
 
         afterEach(() => {
