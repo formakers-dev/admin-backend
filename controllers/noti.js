@@ -47,6 +47,51 @@ const sendNotiByTopic = (req, res) => {
         });
 };
 
+const sendPointNoti = (req, res) => {
+    console.log('sendPointNoti');
+
+    const pointNotiMap = req.body.reduce((map, pointNotiData) => {
+        console.log(pointNotiData);
+        const key = pointNotiData.point + "_" + pointNotiData.award.typeCode;
+
+        if (!!!map[key]) {
+            map[key] = {
+                userIds: [pointNotiData.userId],
+                point: pointNotiData.point,
+                award: pointNotiData.award,
+                betaTest: pointNotiData.betaTest,
+            };
+        } else {
+            map[key].userIds.push(pointNotiData.userId);
+        }
+
+        return map;
+    }, {});
+
+    const keys = Object.keys(pointNotiMap);
+    keys.forEach(key => {
+        const receivers = {
+            type: 'userId',
+            value: pointNotiMap[key].userIds
+        };
+
+        NotiService.request(receivers, {
+            channel: 'channel_point',
+            title: '💰 ' + pointNotiMap[key].point.toLocaleString() + '포인트 적립 💰',
+            subTitle: '👏 ' + pointNotiMap[key].betaTest.title + ' - ' + pointNotiMap[key].award.title + '으로 선정되었습니다!',
+            deeplink: 'fomes://point/history'
+        })
+        .then(users => {
+            console.log(users ? users.length : 0 + '건의 포인트 지급 알림이 전송되었음');
+        })
+        .catch(err => {
+            console.error(err);
+        });
+    });
+
+    res.sendStatus(200);
+};
+
 const getReservedNotiList = (req, res) => {
     console.log('getReservedNotiList');
 
@@ -112,4 +157,12 @@ const updateReservedNotiByTopic = (req, res) => {
 
 };
 
-module.exports = { sendNoti, sendNotiByTopic, getReservedNotiList, cancelReservedNoti, updateReservedNoti, updateReservedNotiByTopic };
+module.exports = {
+    sendNoti,
+    sendNotiByTopic,
+    sendPointNoti,
+    getReservedNotiList,
+    cancelReservedNoti,
+    updateReservedNoti,
+    updateReservedNotiByTopic
+};

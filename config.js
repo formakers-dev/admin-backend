@@ -57,9 +57,12 @@ config.test = {
     // testCustomerId: 'googleTestCustomerId',
     // testCustomerName: 'TestCustomer',
     // testProjectId: 99999999,
-    testUser: {
+    adminUser: {
         account: 'test@user.com',
         status: 'active',
+    },
+    fomesUser: {
+        userId: 'fomesTestUserId',
     },
     accessToken: {
         valid: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOGQ3ZDI4ZTEwNWViMjgzOTkwZDI5NyIsImlhdCI6MTU4NjMzMTg5MSwiZXhwIjoxNzQ0MTE5ODkxfQ.mMnIbFMiIBsL3RT--k2A0xzS1InMqqhXAtvPEcDcbco'

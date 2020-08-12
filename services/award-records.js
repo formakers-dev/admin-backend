@@ -1,6 +1,7 @@
 const AwardRecords = require('../models/award-records');
 const BetaTests = require('../models/betaTests');
 const Users = require('../models/users').Users;
+const NotExistUser = require('../services/users').NotExistUser;
 
 const getAwardRecords = (req) => {
     const path = req.query.path;
@@ -10,6 +11,7 @@ const getAwardRecords = (req) => {
         return getAwardRecordsByBetaTestId(req);
     }
 };
+
 const getAwardRecordsByBetaTestId = (req) =>{
     const promises = [];
     const betaTest = BetaTests.findOne({_id : req.query.betaTestId});
@@ -23,6 +25,7 @@ const getAwardRecordsByBetaTestId = (req) =>{
         return Promise.resolve(data);
     }).catch(err => Promise.reject(err));
 };
+
 const getAwardRecordsByUserId = (req) =>{
     return AwardRecords.aggregate([
         { $match:{userId:req.query.userId}},
@@ -37,48 +40,41 @@ const getAwardRecordsByUserId = (req) =>{
         data['awardRecords'] = results;
         return Promise.resolve(data);
     }).catch(err => Promise.reject(err));
-}
+};
 
-const registerAwardRecords = (req, res) => {
-    const userKey = req.body.userKey;
-    const keywords = req.body.users;
-    if(userKey !=='email' && userKey !=='userId' && userKey !=='nickName'){
-        return res.status(400).json({error:'잘못된 타입입니다.'});
-    }
+const registerAwardRecords = (userIdentifier, betaTestId, award, reward) => {
     const filter = {};
-    filter[userKey] = {$in: keywords};
+    filter[userIdentifier.type] = {$in: userIdentifier.data};
 
-    const options = {
-        lean : true
-    };
-    Users.find(filter,{userId:1,nickName:1, email:1},options,(err, result)=>{
-        if(err){
-            console.error(error);
-            throw err;
-        }
-        if(!result){
-            return res.sendStatus(204);
-        }
-        const data = [];
-        result.forEach(e =>{
-            data.push({
-                userId: e.userId,
-                betaTestId: req.body.betaTestId,
-                type: req.body.type,
-                typeCode: req.body.typeCode,
-                nickName: e.nickName,
-                reward:{
-                    description: req.body.reward.description,
-                    price: req.body.reward.price
-                }
-            });
-        })
-        AwardRecords.insertMany(data).then(insertResult=>{
-            return res.status(200).json(result);
-        }).catch(e=>{
-            throw e;
-        });
-    });
+    let users;
+
+    return Users.find(filter, {userId: 1, nickName: 1, email: 1})
+      .lean()
+      .then(result => {
+          users = result;
+          console.log(users);
+
+          if (!users || users.length <= 0) {
+              return Promise.reject(new NotExistUser());
+          }
+
+          const awardRecords = users.map(e => {
+              return {
+                  userId: e.userId,
+                  betaTestId: betaTestId,
+                  type: award.type,
+                  typeCode: award.typeCode,
+                  nickName: e.nickName,
+                  reward: {
+                      description: reward.description,
+                      price: reward.price,
+                      paymentType: reward.paymentType
+                  }
+              };
+          });
+
+          return AwardRecords.insertMany(awardRecords)
+      }).then(() => Promise.resolve(users));
 };
 
 const updateAwardRecords = (req) => {

@@ -1,5 +1,12 @@
 const Users = require('../models/users').Users;
 
+class NotExistUser extends Error {
+    constructor(message) {
+        super(message);
+        this.name = this.constructor.name;
+    }
+}
+
 const getUser = (req, res) => {
     const type = req.query.type;
     const keyword = req.query.keyword;
@@ -57,6 +64,7 @@ const getAllUsers = (req, res) => {
 };
 
 module.exports = {
-    getUser, getUsers, getAllUsers
+    getUser, getUsers, getAllUsers,
+    NotExistUser
 };
 

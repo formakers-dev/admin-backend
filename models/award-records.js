@@ -5,6 +5,7 @@ const connection = db.FOMES;
 const Reward = {
     description: String,
     price: Number,
+    paymentType: String,
 };
 
 const AwardRecordsSchema = new mongoose.Schema({

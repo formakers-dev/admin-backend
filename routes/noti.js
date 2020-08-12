@@ -13,4 +13,6 @@ router.put('/topics/:topic', Auth.verifyToken, Controller.updateReservedNotiByTo
 router.post('/reserved/cancel', Auth.verifyToken, Controller.cancelReservedNoti);
 router.get('/reserved', Auth.verifyToken, Controller.getReservedNotiList);
 
+router.post('/point', Auth.verifyToken, Controller.sendPointNoti);
+
 module.exports = router;
