@@ -3,19 +3,14 @@ const BetaTests = require('../models/betaTests');
 const Users = require('../models/users').Users;
 const NotExistUser = require('../services/users').NotExistUser;
 
-const getAwardRecords = (req) => {
-    const path = req.query.path;
-    if(path === 'user'){
-        return getAwardRecordsByUserId(req);
-    }else if(path === 'beta-test'){
-        return getAwardRecordsByBetaTestId(req);
-    }
+const getAwardRecords = () => {
+    return AwardRecords.find({}).lean();
 };
 
-const getAwardRecordsByBetaTestId = (req) =>{
+const getAwardRecordsByBetaTestId = (betaTestId) =>{
     const promises = [];
-    const betaTest = BetaTests.findOne({_id : req.query.betaTestId});
-    const awardRecords = AwardRecords.find({betaTestId:  req.query.betaTestId}).lean();
+    const betaTest = BetaTests.findOne({_id : betaTestId});
+    const awardRecords = AwardRecords.find({betaTestId: betaTestId}).lean();
     promises.push(betaTest);
     promises.push(awardRecords);
     return Promise.all(promises).then(results =>{
@@ -26,15 +21,17 @@ const getAwardRecordsByBetaTestId = (req) =>{
     }).catch(err => Promise.reject(err));
 };
 
-const getAwardRecordsByUserId = (req) =>{
+const getAwardRecordsByUserId = (userId) =>{
     return AwardRecords.aggregate([
-        { $match:{userId:req.query.userId}},
-        { $lookup : {
+        { $match: { userId: userId } },
+        {
+            $lookup: {
                 from: 'beta-tests',
                 localField: 'betaTestId',
                 foreignField: '_id',
                 as: 'betaTest'
-            }}
+            }
+        }
     ]).then(results=>{
         const data = {};
         data['awardRecords'] = results;
@@ -87,6 +84,7 @@ const deleteAwardRecords = (req) => {
 
 module.exports = {
     getAwardRecords,
+    getAwardRecordsByBetaTestId,
     registerAwardRecords,
     updateAwardRecords,
     deleteAwardRecords,

@@ -20,6 +20,7 @@ const history = require('connect-history-api-fallback');
 const awardRecordsRouter = require('./routes/award-records');
 const statisticsRouter = require('./routes/statistics');
 const pointsRouter = require('./routes/points');
+const usagesRouter = require('./routes/usages');
 
 const app = express();
 // app.use(history());
@@ -67,6 +68,7 @@ app.use('/api/participants', participantsRouter);
 app.use('/api/award-records', awardRecordsRouter);
 app.use('/api/statistics', statisticsRouter);
 app.use('/api/points', pointsRouter);
+app.use('/api/usages', usagesRouter);
 
 
 // catch 404 and forward to error handler

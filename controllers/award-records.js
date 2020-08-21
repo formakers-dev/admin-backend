@@ -3,7 +3,18 @@ const PointsService = require('../services/points');
 const NotExistUser = require('../services/users').NotExistUser;
 
 const getAwardRecords = (req, res) => {
-    AwardRecordsService.getAwardRecords(req)
+
+  let getAwardRecordsPromise;
+
+  if (req.path.startsWith('/user')) {
+    getAwardRecordsPromise = AwardRecordsService.getAwardRecordsByUserId(req.params.id)
+  } else if (req.path.startsWith('/beta-test')) {
+    getAwardRecordsPromise = AwardRecordsService.getAwardRecordsByBetaTestId(req.params.id)
+  } else {
+    getAwardRecordsPromise = AwardRecordsService.getAwardRecords()
+  }
+
+  getAwardRecordsPromise
         .then(result => res.json(result))
         .catch(err => res.status(500).json({error: err.message}));
 };
