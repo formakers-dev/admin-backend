@@ -5,6 +5,8 @@ const getGameAppUsages = (req, res) => {
   let getPromise;
   if (req.query.app_name) {
     getPromise = AppUsagesService.getAllByAppName(req.query.app_name);
+  } else if (req.query.package_name) {
+    getPromise = AppUsagesService.getAllByPackageName(req.query.package_name);
   } else {
     getPromise = AppUsagesService.getAll();
   }

@@ -26,17 +26,30 @@ describe('Usages', () => {
   });
 
   describe('GET /api/usages/game?app_name={appName}', () => {
-    it('게임 플레이 데이터를 모두 조회한다', done => {
+    it('해당 앱의 게임 플레이 데이터 조회한다', done => {
       request.get('/api/usages/game?app_name=' + encodeURIComponent("애니팡"))
         .set('Authorization', config.accessToken.valid)
         .expect(200)
         .then(res => {
-          console.log(res.body);
           res.body.length.should.be.eql(2);
           done();
         }).catch(err => done(err));
     });
   });
+
+
+  describe('GET /api/usages/game?package_name={pacakgeName}', () => {
+    it('해당 앱의 게임 플레이 데이터를 모두 조회한다', done => {
+      request.get('/api/usages/game?package_name=com.sundaytoz.kakao.anipang4')
+        .set('Authorization', config.accessToken.valid)
+        .expect(200)
+        .then(res => {
+          res.body.length.should.be.eql(2);
+          done();
+        }).catch(err => done(err));
+    });
+  });
+
 
   afterEach(done => {
     AppUsages.remove({}, done);
