@@ -17,7 +17,7 @@ describe('AwardRecords', () => {
           .catch(err => done(err));
     });
 
-    describe('PUT /api/award-records/', () => {
+    describe('POST /api/award-records/', () => {
         it('수상자 등록 시 지급 타입이 포인트면, 포인트가 적립된다', done => {
             const requestBody = {
                 userIdentifier: {
@@ -44,13 +44,17 @@ describe('AwardRecords', () => {
                 .set('Authorization', config.accessToken.valid)
                 .expect(200)
                 .send(requestBody)
-                .then(() => PointRecords.find({
-                    userId: {$in: requestBody.userIdentifier.data},
+                .then(res => {
+                  console.log('res.body=', res.body)
+                  const responseBody = res.body;
+                  return PointRecords.find({
+                    userId: {$in: requestBody.userIdentifier.data },
                     type: PointConstants.TYPE.SAVE,
                     status: PointConstants.STATUS.COMPLETED,
-                    "metaData.refType" : "beta-test",
-                    "metaData.refId": requestBody.betaTest.id
-                }))
+                    "metaData.betaTestId": requestBody.betaTest.id,
+                    "metaData.awardRecordId": { $in: responseBody.map(res => res._id) }
+                  })
+                })
                 .then(res => {
                     console.log(res)
                     res.length.should.be.eql(2);

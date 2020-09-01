@@ -32,13 +32,18 @@ const registerAwardRecords = (req, res) => {
     let responseData;
 
     AwardRecordsService.registerAwardRecords(req.body.userIdentifier, betaTest.id, award, reward)
-      .then(users => {
-          responseData = users;
+      .then(awardRecords => {
+          responseData = awardRecords;
 
           if (reward.paymentType === "point") {
-            const userIds = users.map(user => user.userId);
+            const uniqueIds = awardRecords.map(awardRecord => {
+              return {
+                userId: awardRecord.userId,
+                awardRecordId: awardRecord._id,
+              };
+            });
             const pointDescription = betaTest.title + " - " + award.typeName;
-            return PointsService.insertManyPointsForSave(userIds, reward.price, pointDescription, 'beta-test', betaTest.id);
+            return PointsService.insertManyPointsForSave(uniqueIds, reward.price, pointDescription, betaTest.id);
           } else {
             return Promise.resolve();
           }
