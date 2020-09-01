@@ -86,16 +86,15 @@ describe('PointRecords', () => {
     describe('DELETE /api/points/beta-test/:betaTestId/save', () => {
         it('특정 베타테스트 및 특정 유저의 적립 포인트 삭제 요청 시, 해당 포인트 이력을 삭제한다', done => {
             const betaTestId = '5dd38c8cb1e19307f5fce299';
-            const userIds = [config.fomesUser.userId, 'googleUserId'];
+            const awardRecordIds = ['111111111111111111111115', '111111111111111111111114'];
 
             request.delete('/api/points/beta-test/' + betaTestId + '/save')
                 .set('Authorization', config.accessToken.valid)
                 .expect(200)
-                .send({userIds: userIds})
+                .send({awardRecordIds: awardRecordIds})
                 .then(() => PointRecords.find({
-                    userId: {$in: userIds},
-                    'metaData.refType': 'beta-test',
-                    'metaData.refId': betaTestId
+                    'metaData.betaTestId': betaTestId,
+                    'metaData.awardRecordId': { $in: awardRecordIds }
                 }))
                 .then(pointRecords => {
                     console.log(pointRecords);
@@ -103,13 +102,12 @@ describe('PointRecords', () => {
 
                     // 그 외 이력들이 삭제되지 않았는지 확인
                     return PointRecords.find({
-                        userId: {$in: userIds},
-                        'metaData.refType': 'beta-test',
+                        'metaData.betaTestId': betaTestId,
                     });
                 })
                 .then(pointRecords => {
                     console.log(pointRecords);
-                    pointRecords.length.should.be.eql(2);
+                    pointRecords.length.should.be.eql(1);
                     done();
                 }).catch(err => done(err));
         });

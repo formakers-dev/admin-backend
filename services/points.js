@@ -47,12 +47,11 @@ const insertManyPointsForSave = (userIds, point, description, refType, refId) =>
     return PointRecords.insertMany(pointRecords);
 };
 
-const deleteSavePoints = (bestTestId, userIds) => {
+const deleteSavePoints = (bestTestId, awardRecordIds) => {
     return PointRecords.remove({
-        userId : { $in : userIds },
         type: PointConstant.TYPE.SAVE,
-        'metaData.refType': 'beta-test',
-        'metaData.refId': bestTestId
+        'metaData.betaTestId': bestTestId,
+        'metaData.awardRecordId': { $in: awardRecordIds },
     });
 };
 

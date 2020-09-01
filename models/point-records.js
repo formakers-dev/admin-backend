@@ -29,8 +29,8 @@ const schema = new Schema({
   status: Number,
   description: String,
   metaData: {
-    refType: String,
-    refId: ObjectId,
+    betaTestId: ObjectId,
+    awardRecordId: ObjectId,
   },
   operationData: {
     status: Number,
