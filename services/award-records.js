@@ -43,12 +43,10 @@ const registerAwardRecords = (userIdentifier, betaTestId, award, reward) => {
     const filter = {};
     filter[userIdentifier.type] = {$in: userIdentifier.data};
 
-    let users;
-
     return Users.find(filter, {userId: 1, nickName: 1, email: 1})
       .lean()
       .then(result => {
-          users = result;
+          const users = result;
           console.log(users);
 
           if (!users || users.length <= 0) {
@@ -71,7 +69,7 @@ const registerAwardRecords = (userIdentifier, betaTestId, award, reward) => {
           });
 
           return AwardRecords.insertMany(awardRecords)
-      }).then(() => Promise.resolve(users));
+      }).then(res => Promise.resolve(res));
 };
 
 const updateAwardRecords = (req) => {

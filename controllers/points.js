@@ -37,9 +37,9 @@ const updateOperationDataForExchange = (req, res) => {
 
 const deleteSavePoints = (req, res) => {
     const bestTestId = req.params.betaTestId;
-    const userIds = req.body.userIds;
+    const awardRecordIds = req.body.awardRecordIds;
 
-    service.deleteSavePoints(bestTestId, userIds)
+    service.deleteSavePoints(bestTestId, awardRecordIds)
         .then(() => res.sendStatus(200))
         .catch(err => {
             console.error(err);
