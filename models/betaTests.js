@@ -18,6 +18,7 @@ const Rewards = {
 
 const betaTestSchema = new Schema({
     _id: mongoose.Schema.Types.ObjectId,
+    refTitle: String,
     title: String,
     description: String,
     subjectType: String,
