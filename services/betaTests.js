@@ -89,10 +89,54 @@ const findBetaTest = (id) => {
     }).catch(err => Promise.reject(err));
 };
 
+const readFeedbackAggregations = async (betaTestId, missionId) => {
+    return BetaTestMissions.findOne({
+        _id: missionId,
+        betaTestId: betaTestId,
+    }, {
+        feedbackAggregationUrl: 1,
+    }).then(async result => {
+        const idMatchResults = result.feedbackAggregationUrl.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([A-Za-z0-9_-]*)[?]?.*/);
+        const sheetId = idMatchResults[1];
+
+        // TODO : 유틸화시켜 리팩토링 필요
+        const GoogleSpreadsheet = require('google-spreadsheet').GoogleSpreadsheet;
+        const credentials = require('../google-docs-credentials.json');
+        const doc = new GoogleSpreadsheet(sheetId);
+
+        await doc.useServiceAccountAuth(credentials);
+        await doc.loadInfo();
+        console.log(doc.title);
+        const sheet = doc.sheetsByIndex[0];
+
+        await sheet.loadHeaderRow();
+        const headers = sheet.headerValues;
+
+        const rows = await sheet.getRows();
+        const newRows = rows.map((row, index) => {
+            const newRow = {
+                order: index + 1,
+            };
+
+            headers.forEach(header => {
+                newRow[header] = row[header];
+            })
+
+            return newRow;
+        })
+
+        return {
+            questions: headers,
+            answerRows: newRows,
+        };
+    }).catch(err => Promise.reject(err));
+}
+
+
 module.exports = {
     insertBetaTest,
     updateBetaTest,
     findAllBetaTest,
-    findBetaTest
+    findBetaTest,
+    readFeedbackAggregations,
 };
-

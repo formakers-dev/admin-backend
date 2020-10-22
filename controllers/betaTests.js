@@ -51,9 +51,21 @@ const getBetaTest = (req, res) => {
         });
 };
 
+const getFeedback = (req, res) => {
+    BetaTestService.readFeedbackAggregations(req.params.betaTestId, req.params.missionId)
+      .then(data => {
+          res.json(data);
+      })
+      .catch(err => {
+          console.error(err);
+          res.status(500).json({error: err.message});
+      })
+}
+
 module.exports = {
     registerBetaTest,
     updateBetaTest,
     getAllBetaTests,
-    getBetaTest
+    getBetaTest,
+    getFeedback
 };
