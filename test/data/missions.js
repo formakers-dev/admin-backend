@@ -15,7 +15,8 @@ const data = [
     "guide": "* 솔직하고 구체적으로 의견을 적어주시는게 제일 중요합니다!\n* 불성실한 응답은 보상지급 대상자에서 제외될 수 있습니다.",
     "actionType": "link",
     "action": "https://www.naver.com",
-    "feedbackAggregationUrl" : "https://docs.google.com/spreadsheets/d/1yuzVW_TFUfw2Uh98fEHuqzTy1lvRpC-p6oaC4eda71Y"
+    // "feedbackAggregationUrl" : "https://docs.google.com/spreadsheets/d/1yuzVW_TFUfw2Uh98fEHuqzTy1lvRpC-p6oaC4eda71Y"
+    "feedbackAggregationUrl" : "https://docs.google.com/spreadsheets/d/1shk6rNq_xQUqQcAk13pbiJ0-ycuFZUv8Lww1JDy0EAE/"
   },
   {
     "_id": ObjectId("5d199913839927107f4bb93f"),

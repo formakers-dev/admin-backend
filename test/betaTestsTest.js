@@ -49,7 +49,7 @@ describe('BetaTest', () => {
         .set('Authorization', config.accessToken.valid)
         .expect(200)
         .then(res => {
-          console.log(res.body);
+          console.error(res.body);
           done();
         }).catch(err => done(err));
     })

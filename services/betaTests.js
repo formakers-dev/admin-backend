@@ -107,27 +107,41 @@ const readFeedbackAggregations = async (betaTestId, missionId) => {
         await doc.useServiceAccountAuth(credentials);
         await doc.loadInfo();
         console.log(doc.title);
-        const sheet = doc.sheetsByIndex[0];
+        const sheet = doc.sheetsByIndex[1];
 
+        // for header
         await sheet.loadHeaderRow();
-        const headers = sheet.headerValues;
-
         const rows = await sheet.getRows();
-        const newRows = rows.map((row, index) => {
-            const newRow = {
+        const headers = sheet.headerValues
+          .filter(header => header.length > 0)
+          .map(header => {
+            return {
+                key: header,
+                isOptional: rows[0][header],
+                isLongText: typeof rows[1][header] === 'string' ? rows[1][header] :  rows[1][header] === 'TRUE',
+                question: rows[2][header],
+            }
+        });
+        const headerKeys = headers.map(h => h.key);
+
+        // for answers
+        const answerRows = await sheet.getRows({offset: 3});
+        const answers = answerRows.map((answerRow, index) => {
+            const answer = {
                 order: index + 1,
             };
 
-            headers.forEach(header => {
-                newRow[header] = row[header];
+            headerKeys.forEach(header => {
+                answer[header] = answerRow[header];
             })
 
-            return newRow;
+            return answer;
         })
 
         return {
-            questions: headers,
-            answerRows: newRows,
+            headers: headers,
+            headerKeys: headerKeys,
+            answers: answers,
         };
     }).catch(err => Promise.reject(err));
 }
