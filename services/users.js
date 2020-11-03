@@ -27,28 +27,11 @@ const getUser = (req, res) => {
     });
 };
 
-const getUsers = (req, res) => {
-    const type = req.body.type;
-    const keywords = req.body.keywords;
-    if(type !=='email' && type !=='userId' && type !=='nickName'){
-        return res.status(400).json({error:'잘못된 타입입니다.'});
-    }
+const getUsers = (type, keywords) => {
     const filter = {};
     filter[type] = {$in: keywords};
 
-    const options = {
-        lean : true
-    };
-    Users.find(filter,null,options,(err, result)=>{
-        if(err){
-            console.error(error);
-            throw err;
-        }
-        if(!result){
-            return res.sendStatus(204);
-        }
-        return res.status(200).json(result);
-    });
+    return Users.find(filter, { _id: false }).lean();
 };
 
 const getAllUsers = (req, res) => {

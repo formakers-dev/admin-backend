@@ -45,6 +45,9 @@ if (config.web.cors) {
     app.use(cors(corsOptions));
 }
 
+// prevent 304
+app.set("etag", false);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');

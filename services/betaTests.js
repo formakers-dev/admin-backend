@@ -89,10 +89,68 @@ const findBetaTest = (id) => {
     }).catch(err => Promise.reject(err));
 };
 
+const readFeedbackAggregations = async (betaTestId, missionId) => {
+    return BetaTestMissions.findOne({
+        _id: missionId,
+        betaTestId: betaTestId,
+    }, {
+        feedbackAggregationUrl: 1,
+    }).then(async result => {
+        const idMatchResults = result.feedbackAggregationUrl.match(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([A-Za-z0-9_-]*)[?]?.*/);
+        const sheetId = idMatchResults[1];
+
+        // TODO : 유틸화시켜 리팩토링 필요
+        const GoogleSpreadsheet = require('google-spreadsheet').GoogleSpreadsheet;
+        const credentials = require('../google-docs-credentials.json');
+        const doc = new GoogleSpreadsheet(sheetId);
+
+        await doc.useServiceAccountAuth(credentials);
+        await doc.loadInfo();
+        console.log(doc.title);
+        const sheet = doc.sheetsByIndex[1];
+
+        // for header
+        await sheet.loadHeaderRow();
+        const rows = await sheet.getRows();
+        const headers = sheet.headerValues
+          .filter(header => header.length > 0)
+          .map(header => {
+            return {
+                key: header,
+                isOptional: rows[0][header],
+                isLongText: typeof rows[1][header] === 'string' ? rows[1][header] :  rows[1][header] === 'TRUE',
+                question: rows[2][header],
+            }
+        });
+        const headerKeys = headers.map(h => h.key);
+
+        // for answers
+        const answerRows = await sheet.getRows({offset: 3});
+        const answers = answerRows.map((answerRow, index) => {
+            const answer = {
+                order: index + 1,
+            };
+
+            headerKeys.forEach(header => {
+                answer[header] = answerRow[header];
+            })
+
+            return answer;
+        })
+
+        return {
+            headers: headers,
+            headerKeys: headerKeys,
+            answers: answers,
+        };
+    }).catch(err => Promise.reject(err));
+}
+
+
 module.exports = {
     insertBetaTest,
     updateBetaTest,
     findAllBetaTest,
-    findBetaTest
+    findBetaTest,
+    readFeedbackAggregations,
 };
-

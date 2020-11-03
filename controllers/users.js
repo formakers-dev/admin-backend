@@ -16,12 +16,23 @@ const getUsers = (req, res) => {
 };
 
 const getUsersByFilter = (req, res) => {
-    try{
-        return UsersService.getUsers(req, res);
-    }catch(err){
-        console.error(err);
-        return res.status(500).json({error : err.message});
+    const type = req.body.type;
+    const keywords = req.body.keywords;
+
+    if (type !=='email' && type !=='userId' && type !=='nickName') {
+        return res.status(400).json({error: '잘못된 타입입니다.'});
     }
+
+    UsersService.getUsers(type, keywords)
+      .then(result => {
+          if (!result) {
+              res.sendStatus(204);
+          }
+          res.status(200).json(result);
+      }).catch(err => {
+          console.error(err);
+          return res.status(500).json({error: err.message});
+      });
 };
 
 const getAllUsers = (req, res) => {
