@@ -6,10 +6,15 @@ const request = require('supertest').agent(server);
 const config = require('../config');
 
 const BetaTests = require('../models/betaTests');
+const BetaTestMissions = require('../models/betaTestMissions');
 
 describe('BetaTest', () => {
 
-  before(() => {
+  before(done => {
+    BetaTests.create(require('./data/beta-tests.js'))
+      .then(() => BetaTestMissions.create(require('./data/missions.js')))
+      .then(() => done())
+      .catch(err => done(err));
   });
 
   beforeEach(() => {
@@ -38,11 +43,24 @@ describe('BetaTest', () => {
 
   });
 
+  describe('GET /api/beta-test/:id/mission/:missionId/feedback', () => {
+    it('해당 미션의 응답 집계 스프레드 시트를 읽어 반환한다', done => {
+      request.get('/api/beta-test/5c25e1e824196d19231fbed3/mission/5d199927839927107f4bb940/feedback')
+        .set('Authorization', config.accessToken.valid)
+        .expect(200)
+        .then(res => {
+          console.error(res.body);
+          done();
+        }).catch(err => done(err));
+    })
+  });
+
   afterEach(() => {
   });
 
   after(done => {
     BetaTests.remove({})
+      .then(() => BetaTestMissions.remove({}))
       .then(() => done())
       .catch(err => done(err));
   });

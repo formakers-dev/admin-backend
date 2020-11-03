@@ -15,6 +15,21 @@ aliases:
       sleep 5
       heroku restart
 
+  - &filter-dev-branch
+    branches:
+      ignore:
+        - release
+
+  - &filter-master-branch
+    branches:
+      only:
+        - master
+
+  - &filter-release-branch
+    branches:
+      only:
+        - release
+
 defaults: &defaults
     working_directory: ~/fomes-admin-backend # directory where steps will run
     docker:
@@ -100,20 +115,10 @@ workflows:
     jobs:
       - test
       - dev-deploy:
-          filters:
-            branches:
-              only:
-                - master
-                - jo
+          filters: *filter-dev-branch
       - stg-deploy:
           requires:
             - dev-deploy
-          filters:
-            branches:
-              only:
-                - master
+          filters: *filter-master-branch
       - prd-deploy:
-          filters:
-            branches:
-             only:
-                - release
+          filters: *filter-release-branch

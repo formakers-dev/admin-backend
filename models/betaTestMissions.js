@@ -19,6 +19,7 @@ const schema = new mongoose.Schema({
     // 임시
     actionType: String,
     action: String,
+    feedbackAggregationUrl: String,
 });
 
 module.exports = connection.model('missions', schema);
